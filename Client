@@ -123,6 +123,11 @@ class MessageListener extends Thread{
 					joinCheck(m[1]);
 				}
 				
+				/* 중복확인 */
+				else if(m[0].equals(overTag)) {
+					overlapCheck(m[1]);
+				}
+				
 				/* 회원정보 조회 */
 				else if(m[0].equals(viewTag)) {
 					viewMyInfo(m[1], m[2], m[3]);
@@ -220,16 +225,10 @@ class MessageListener extends Thread{
 			JOptionPane.showMessageDialog(null, "회원가입에 성공하였습니다", "회원가입 성공", JOptionPane.INFORMATION_MESSAGE);
 			client.jf.dispose();
 			System.out.println("[Client] 회원가입 성공 : 회원가입 인터페이스 종료");
-			client.jf.name.setText("");
-			client.jf.nickname.setText("");
-			client.jf.id.setText("");
-			client.jf.pw.setText("");
-			client.jf.post.setText("");
-			client.jf.email.setText("");
 		}
 		
 		else {				//회원가입 실패
-			JOptionPane.showMessageDialog(null, "아이디가 중복되었는지 확인하세요", "회원가입 실패", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(null, "닉네임이나 이름이 중복되었는지 확인하세요", "회원가입 실패", JOptionPane.ERROR_MESSAGE);
 			System.out.println("[Client] 회원가입 실패");
 			client.jf.name.setText("");
 			client.jf.nickname.setText("");
@@ -237,6 +236,21 @@ class MessageListener extends Thread{
 			client.jf.pw.setText("");
 			client.jf.post.setText("");
 			client.jf.email.setText("");
+		}
+	}
+	
+	/* 중복 여부를 확인하는 메소드 */
+	void overlapCheck(String _m) {
+		if(_m.equals("OKAY")) {	//사용 가능
+			System.out.println("[Client] 사용 가능");
+			JOptionPane.showMessageDialog(null, "사용 가능한 닉네임/아이디 입니다", "중복 확인", JOptionPane.INFORMATION_MESSAGE);
+		}
+		
+		else {				//사용 불가능
+			System.out.println("[Client] 사용 불가능");
+			JOptionPane.showMessageDialog(null, "이미 존재하는 닉네임/아이디 입니다", "중복 확인", JOptionPane.ERROR_MESSAGE);
+			client.jf.nickname.setText("");
+			client.jf.id.setText("");
 		}
 	}
 	
