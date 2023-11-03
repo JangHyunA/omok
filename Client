@@ -224,6 +224,7 @@ class MessageListener extends Thread{
 			client.jf.nickname.setText("");
 			client.jf.id.setText("");
 			client.jf.pw.setText("");
+			client.jf.post.setText("");
 			client.jf.email.setText("");
 		}
 		
@@ -234,6 +235,7 @@ class MessageListener extends Thread{
 			client.jf.nickname.setText("");
 			client.jf.id.setText("");
 			client.jf.pw.setText("");
+			client.jf.post.setText("");
 			client.jf.email.setText("");
 		}
 	}
