@@ -118,6 +118,7 @@ public class JoinFrame extends JFrame{
 			String unick = nickname.getText();
 			String uid = id.getText();
 			String upass = "";
+			String upost = post.getText();
 			for(int i=0; i<pw.getPassword().length; i++) {
 				upass = upass + pw.getPassword()[i];
 			}
@@ -131,15 +132,15 @@ public class JoinFrame extends JFrame{
 			
 			/* 가입하기 버튼 이벤트 */
 			else if(b.getText().equals("가입하기")) {
-				if(uname.equals("") || unick.equals("") || uid.equals("") || upass.equals("") || uemail.equals("")) {
+				if(uname.equals("") || unick.equals("") || uid.equals("") || upass.equals("") || upost.equals("") || uemail.equals("")) {
 					//모든 정보가 입력되지 않으면 회원가입 시도 실패
 					JOptionPane.showMessageDialog(null, "모든 정보를 기입해주세요", "회원가입 실패", JOptionPane.ERROR_MESSAGE);
 					System.out.println("[Client] 회원가입 실패 : 회원정보 미입력");
 				}
 				
-				else if(!uname.equals("") && !unick.equals("") && !uid.equals("") && !upass.equals("") && !uemail.equals("")) {
+				else if(!uname.equals("") && !unick.equals("") && !uid.equals("") && !upass.equals("") && !upost.equals("") && !uemail.equals("")) {
 					//회원가입 시도 성공
-					c.sendMsg(joinTag + "//" + uname + "//" + unick + "//" + uid + "//" + upass + "//" + uemail);	//서버에 회원가입 정보 전송
+					c.sendMsg(joinTag + "//" + uname + "//" + unick + "//" + uid + "//" + upass + "//" + upost + "//" + uemail);	//서버에 회원가입 정보 전송
 				}
 			}
 		}
