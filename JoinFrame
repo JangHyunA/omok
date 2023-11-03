@@ -28,6 +28,7 @@ public class JoinFrame extends JFrame{
 	/* Button */
 	JButton nnolBtn = new JButton("확인");
 	JButton idolBtn = new JButton("확인");
+	JButton psolBtn = new JButton("확인");
 	JButton joinBtn = new JButton("가입하기");
 	JButton cancelBtn = new JButton("가입취소");
 	
@@ -35,6 +36,7 @@ public class JoinFrame extends JFrame{
 	
 	final String joinTag = "JOIN";	//회원가입 기능 태그
 	final String overTag = "OVER";	//중복확인 기능 태그
+	final String pwTag = "SAFE";	//비밀번호 유효성 태그
 	
 	JoinFrame(Client _c) {
 		c = _c;
@@ -53,13 +55,14 @@ public class JoinFrame extends JFrame{
 		name.setPreferredSize(new Dimension(210, 30));
 		nickname.setPreferredSize(new Dimension(145, 30));
 		id.setPreferredSize(new Dimension(145, 30));
-		pw.setPreferredSize(new Dimension(210, 30));
+		pw.setPreferredSize(new Dimension(145, 30));
 		post.setPreferredSize(new Dimension(210, 30));
 		email.setPreferredSize(new Dimension(210, 30));
 		
 		/* Button 크기 작업 */
 		nnolBtn.setPreferredSize(new Dimension(60, 30));
 		idolBtn.setPreferredSize(new Dimension(60, 30));
+		psolBtn.setPreferredSize(new Dimension(60, 30));
 		joinBtn.setPreferredSize(new Dimension(135, 30));
 		cancelBtn.setPreferredSize(new Dimension(135, 30));
 		
@@ -79,6 +82,7 @@ public class JoinFrame extends JFrame{
 		
 		panel.add(pwL);
 		panel.add(pw);
+		panel.add(psolBtn);
 		
 		panel.add(postL);
 		panel.add(post);
@@ -111,7 +115,18 @@ public class JoinFrame extends JFrame{
 			public void actionPerformed(ActionEvent e) {
 				if(!id.getText().equals("")) {
 					System.out.println("[Client] 아이디 중복 확인");
+					System.out.println(overTag + "//id//" + id.getText());
 					c.sendMsg(overTag + "//id//" + id.getText());	//서버에 태그와 함께 아이디 전송
+				}
+			}
+		});
+		
+		psolBtn.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if(!pw.getPassword().toString().equals("")) {
+					System.out.println("[Client] 비밀번호 유효성 확인");
+					c.sendMsg(pwTag + "//pw//" +String.valueOf(pw.getPassword()));	//서버에 태그와 함께 비밀번호 전송
 				}
 			}
 		});
