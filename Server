@@ -157,6 +157,7 @@ class CCUser extends Thread{
 					}
 				}
 				
+				/* 비밀번호 유효성 검사 */
 				else if(m[0].equals(pwTag)) {
 					if(db.passwordCheck(m[1])) {
 						dos.writeUTF(pwTag+"//OKAY");
