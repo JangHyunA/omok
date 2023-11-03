@@ -115,7 +115,6 @@ public class JoinFrame extends JFrame{
 			public void actionPerformed(ActionEvent e) {
 				if(!id.getText().equals("")) {
 					System.out.println("[Client] 아이디 중복 확인");
-					System.out.println(overTag + "//id//" + id.getText());
 					c.sendMsg(overTag + "//id//" + id.getText());	//서버에 태그와 함께 아이디 전송
 				}
 			}
