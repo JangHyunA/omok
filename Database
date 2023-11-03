@@ -86,6 +86,22 @@ public class Database {
 		return flag;	//flag 반환
 	}
 	
+	boolean passwordCheck(String pass) {
+		boolean flag = false;  // 비밀번호 안전 확인 
+		String valid = "^(?=.*?[!?@#$^*+=-]).{8,}$";
+		try {
+			if (pass.matches(valid)) {
+				flag = false;		// 안전하지않음
+			}
+			else {
+				flag = true;
+			}
+		}catch(Exception e) {
+			System.out.println("[Server] 비밀번호 유효성 검사 실패 > "+ e.toString());
+		}
+		return flag;	
+		
+	}
 	//아이디나 닉네임이 중복되었는지 확인해주는 메소드. 중복 값이 존재하면 false, 존재하지 않으면 true를 반환한다.
 		boolean overCheck(String _a, String _v) {
 			boolean flag = false;	//참거짓을 반환할 flag 변수. 초기값은 false
