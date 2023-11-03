@@ -67,6 +67,7 @@ class CCUser extends Thread{
 	/* 각 메시지를 구분하기 위한 태그 */
 	final String loginTag = "LOGIN";	//로그인
 	final String joinTag = "JOIN";		//회원가입
+	final String overTag = "OVER";		//중복확인
 	final String viewTag = "VIEW";		//회원정보조회
 	final String changeTag = "CHANGE";	//회원정보변경
 	final String rankTag = "RANK";		//전적조회(전체회원)
@@ -135,12 +136,23 @@ class CCUser extends Thread{
 				
 				/* 회원가입 */
 				else if(m[0].equals(joinTag)) {
-					if(db.joinCheck(m[1], m[2], m[3], m[4], m[5])) {	//회원가입 성공
+					if(db.joinCheck(m[1], m[2], m[3], m[4], m[5], m[6])) {	//회원가입 성공
 						dos.writeUTF(joinTag + "//OKAY");
 					}
 					
 					else {	//회원가입 실패
 						dos.writeUTF(joinTag + "//FAIL");
+					}
+				}
+				
+				/* 중복확인 */
+				else if(m[0].equals(overTag)) {
+					if(db.overCheck(m[1], m[2])) {	//사용 가능
+						dos.writeUTF(overTag + "//OKAY");
+					}
+					
+					else {	//사용 불가능
+						dos.writeUTF(overTag + "//FAIL");
 					}
 				}
 				
