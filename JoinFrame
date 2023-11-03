@@ -26,6 +26,7 @@ public class JoinFrame extends JFrame{
 	JTextField email = new JTextField();
 	
 	/* Button */
+	JButton nnolBtn = new JButton("확인");
 	JButton idolBtn = new JButton("확인");
 	JButton joinBtn = new JButton("가입하기");
 	JButton cancelBtn = new JButton("가입취소");
@@ -50,13 +51,14 @@ public class JoinFrame extends JFrame{
 		
 		/* TextField 크기 작업 */
 		name.setPreferredSize(new Dimension(210, 30));
-		nickname.setPreferredSize(new Dimension(210, 30));
+		nickname.setPreferredSize(new Dimension(145, 30));
 		id.setPreferredSize(new Dimension(145, 30));
 		pw.setPreferredSize(new Dimension(210, 30));
 		post.setPreferredSize(new Dimension(210, 30));
 		email.setPreferredSize(new Dimension(210, 30));
 		
 		/* Button 크기 작업 */
+		nnolBtn.setPreferredSize(new Dimension(60, 30));
 		idolBtn.setPreferredSize(new Dimension(60, 30));
 		joinBtn.setPreferredSize(new Dimension(135, 30));
 		cancelBtn.setPreferredSize(new Dimension(135, 30));
@@ -69,6 +71,7 @@ public class JoinFrame extends JFrame{
 		
 		panel.add(nicknameL);
 		panel.add(nickname);
+		panel.add(nnolBtn);
 		
 		panel.add(idL);
 		panel.add(id);
@@ -91,6 +94,17 @@ public class JoinFrame extends JFrame{
 		
 		cancelBtn.addActionListener(bl);
 		joinBtn.addActionListener(bl);
+		
+		/* Button 이벤트 추가 */
+		nnolBtn.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if(!nickname.getText().equals("")) {
+					System.out.println("[Client] 닉네임 중복 확인");
+					c.sendMsg(overTag + "//nickname//" + nickname.getText());	//서버에 태그와 함께 닉네임 전송
+				}
+			}
+		});
 		
 		idolBtn.addActionListener(new ActionListener() {
 			@Override
@@ -118,10 +132,10 @@ public class JoinFrame extends JFrame{
 			String unick = nickname.getText();
 			String uid = id.getText();
 			String upass = "";
-			String upost = post.getText();
 			for(int i=0; i<pw.getPassword().length; i++) {
 				upass = upass + pw.getPassword()[i];
 			}
+			String upost = post.getText();
 			String uemail = email.getText();
 			
 			/* 가입취소 버튼 이벤트 */
