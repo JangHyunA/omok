@@ -79,6 +79,13 @@ public class InfoFrame extends JFrame{
 			public void actionPerformed(ActionEvent e) {
 				System.out.println("[Client] 회원 정보 조회 인터페이스 종료");
 				dispose();
+				
+				name.setText("");
+                nickname.setText("");
+                email.setText("");
+                name.setEditable(false);
+                nickname.setEditable(false);
+                email.setEditable(false);
 			}
 		});
 		
