@@ -130,7 +130,7 @@ class MessageListener extends Thread{
 				}
 				
 				else if(m[0].equals(pwTag)) {
-					pwCheck(m[1]);
+					psCheck(m[1]);
 				}
 				
 				/* 회원정보 조회 */
@@ -259,7 +259,7 @@ class MessageListener extends Thread{
 		}
 	}
 	
-	void pwCheck(String _m) {
+	void psCheck(String _m) {
 		if(_m.equals("OKAY")) {	//사용 가능
 			System.out.println("[Client] 비밀번호 사용 가능");
 			JOptionPane.showMessageDialog(null, "사용 가능한 비밀번호 입니다", "비밀번호 확인", JOptionPane.INFORMATION_MESSAGE);
