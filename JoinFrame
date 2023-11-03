@@ -14,6 +14,7 @@ public class JoinFrame extends JFrame{
 	JLabel nicknameL = new JLabel("닉네임");
 	JLabel idL = new JLabel("아이디");
 	JLabel pwL = new JLabel("비밀번호");
+	JLabel postL = new JLabel("우편번호");
 	JLabel emailL = new JLabel("이메일");
 	
 	/* TextField */
@@ -21,15 +22,18 @@ public class JoinFrame extends JFrame{
 	JTextField nickname = new JTextField();
 	JTextField id = new JTextField();
 	JPasswordField pw = new JPasswordField();
+	JTextField post = new JTextField();
 	JTextField email = new JTextField();
 	
 	/* Button */
+	JButton idolBtn = new JButton("확인");
 	JButton joinBtn = new JButton("가입하기");
 	JButton cancelBtn = new JButton("가입취소");
 	
 	Client c = null;
 	
 	final String joinTag = "JOIN";	//회원가입 기능 태그
+	final String overTag = "OVER";	//중복확인 기능 태그
 	
 	JoinFrame(Client _c) {
 		c = _c;
@@ -41,16 +45,19 @@ public class JoinFrame extends JFrame{
 		nicknameL.setPreferredSize(new Dimension(60, 30));
 		idL.setPreferredSize(new Dimension(60, 30));
 		pwL.setPreferredSize(new Dimension(60, 30));
+		postL.setPreferredSize(new Dimension(60, 30));
 		emailL.setPreferredSize(new Dimension(60, 30));
 		
 		/* TextField 크기 작업 */
 		name.setPreferredSize(new Dimension(210, 30));
 		nickname.setPreferredSize(new Dimension(210, 30));
-		id.setPreferredSize(new Dimension(210, 30));
+		id.setPreferredSize(new Dimension(145, 30));
 		pw.setPreferredSize(new Dimension(210, 30));
+		post.setPreferredSize(new Dimension(210, 30));
 		email.setPreferredSize(new Dimension(210, 30));
 		
 		/* Button 크기 작업 */
+		idolBtn.setPreferredSize(new Dimension(60, 30));
 		joinBtn.setPreferredSize(new Dimension(135, 30));
 		cancelBtn.setPreferredSize(new Dimension(135, 30));
 		
@@ -65,9 +72,13 @@ public class JoinFrame extends JFrame{
 		
 		panel.add(idL);
 		panel.add(id);
+		panel.add(idolBtn);
 		
 		panel.add(pwL);
 		panel.add(pw);
+		
+		panel.add(postL);
+		panel.add(post);
 		
 		panel.add(emailL);
 		panel.add(email);
@@ -81,7 +92,17 @@ public class JoinFrame extends JFrame{
 		cancelBtn.addActionListener(bl);
 		joinBtn.addActionListener(bl);
 		
-		setSize(310, 255);
+		idolBtn.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if(!id.getText().equals("")) {
+					System.out.println("[Client] 아이디 중복 확인");
+					c.sendMsg(overTag + "//id//" + id.getText());	//서버에 태그와 함께 아이디 전송
+				}
+			}
+		});
+		
+		setSize(310, 300);
 		setLocationRelativeTo(null);
 		setResizable(false);
 	}
