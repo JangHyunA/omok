@@ -3,6 +3,8 @@ package omok;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.*;
+import java.net.*;
 
 public class GameFrame extends JFrame{
 	/* Panel */
@@ -22,6 +24,7 @@ public class GameFrame extends JFrame{
 	
 	/* Button */
 	JButton searchBtn = new JButton("전적검색");
+	JButton chatBtn = new JButton("전송");
 	JButton loseBtn = new JButton("기권하기");
 	
 	String selUser;	//선택된 사용자
@@ -42,6 +45,11 @@ public class GameFrame extends JFrame{
 	final String winTag = "WIN";		//승리 태그
 	final String loseTag = "LOSE";		//패배 태그
 	
+	/* Socket과 입출력 스트림 */
+    Socket socket;
+    BufferedReader reader;
+    PrintWriter writer;
+	
 	GameFrame(Client _c) {
 		c = _c;
 		
@@ -49,17 +57,18 @@ public class GameFrame extends JFrame{
 		userList.setPreferredSize(new Dimension(140, 50));
 		
 		/* Label 크기 작업 */
-		la1.setPreferredSize(new Dimension(250, 30));
+		la1.setPreferredSize(new Dimension(250, 10));
 		userListL.setPreferredSize(new Dimension(80, 20));
 		userListL.setHorizontalAlignment(JLabel.LEFT);
-		la2.setPreferredSize(new Dimension(155, 20));
+		la2.setPreferredSize(new Dimension(155, 10));
 		enableL.setPreferredSize(new Dimension(235, 100));
 		enableL.setHorizontalAlignment(JLabel.CENTER);
 		enableL.setForeground(Color.RED);
-		la3.setPreferredSize(new Dimension(250, 70));
+		la3.setPreferredSize(new Dimension(250, 10));
 		
 		/* Button 크기 작업 */
 		searchBtn.setPreferredSize(new Dimension(90, 50));
+		chatBtn.setPreferredSize(new Dimension(60, 30));
 		loseBtn.setPreferredSize(new Dimension(235, 30));
 		
 		/* Panel 추가 작업 */
@@ -76,7 +85,7 @@ public class GameFrame extends JFrame{
 		
 		basePanel.add(centerPanel, BorderLayout.CENTER);
 		basePanel.add(eastPanel, BorderLayout.EAST);
-		
+				
 		eastPanel.add(la1);
 		eastPanel.add(userListL);
 		eastPanel.add(la2);
@@ -84,11 +93,81 @@ public class GameFrame extends JFrame{
 		eastPanel.add(searchBtn);
 		eastPanel.add(enableL);
 		eastPanel.add(la3);
+		
+		// 채팅창 생성
+		JTextArea chatTextArea = new JTextArea();
+		chatTextArea.setEditable(false); // 편집 불가능하도록 설정
+
+		// JScrollPane으로 채팅창 감싸기
+		JScrollPane scrollPane = new JScrollPane(chatTextArea);
+		scrollPane.setPreferredSize(new Dimension(250, 300)); // 크기 설정
+
+		// 패널에 스크롤 패널 추가
+		eastPanel.add(scrollPane);
+		
+		// 채팅 입력 칸 생성
+		JTextField chatInput = new JTextField();
+		chatInput.setPreferredSize(new Dimension(160, 30)); // 크기 조정
+
+		// 채팅 입력 칸과 전송 버튼을 담을 패널 생성
+		JPanel chatPanel = new JPanel();
+		chatPanel.setLayout(new FlowLayout());
+		chatPanel.add(chatInput);
+		chatPanel.add(chatBtn);
+		eastPanel.add(chatPanel);
+		
+		eastPanel.add(chatBtn);
 		eastPanel.add(loseBtn);
+		
+		// 클라이언트 소켓 초기화
+        try {
+        	socket = new Socket("192.168.0.15", 1228); // 서버 주소와 포트번호를 실제 값으로 변경
+           	reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            writer = new PrintWriter(socket.getOutputStream(), true);
+            // 서버와 연결한 후 스트림 초기화
+       	} catch (IOException e) {
+       		e.printStackTrace();
+       	}
+
+        // 채팅 전송 버튼 리스너
+        chatBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                sendMessage(chatInput.getText());
+                chatInput.setText(""); // 입력 필드 지우기
+            }
+	
+			private void sendMessage(String message) {
+				if (!message.isEmpty()) {
+	                // 메시지를 서버로 전송
+	                writer.println("CHAT//" + message);
+	                chatInput.setText(""); // 입력 필드 초기화
+	                // 채팅창에 보낸 메시지 표시
+	                chatTextArea.append("나: " + message + "\n");
+	            }
+			}
+        });
+        
+        // 채팅 수신 스레드
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                String message;
+                try {
+                    while ((message = reader.readLine()) != null) {
+                        // 서버로부터 수신한 메시지를 처리 (예: 화면에 표시)
+                        chatTextArea.append("상대방: " + message + "\n");
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
 		
 		/* Button 이벤트 리스너 추가 */
 		ButtonListener bl = new ButtonListener();
 		loseBtn.addActionListener(bl);
+		chatBtn.addActionListener(bl);
 		searchBtn.addActionListener(bl);
 		
 		/* Mouse 이벤트 리스너 추가 */
