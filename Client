@@ -79,6 +79,7 @@ class MessageListener extends Thread{
 	final String loginTag = "LOGIN";	//로그인
 	final String joinTag = "JOIN";		//회원가입
 	final String overTag = "OVER";		//중복확인
+	final String pwTag = "SAFE";		//비밀번호 유효성
 	final String viewTag = "VIEW";		//회원정보조회
 	final String changeTag = "CHANGE";	//회원정보변경
 	final String rankTag = "RANK";		//전적조회(전체회원)
@@ -126,6 +127,10 @@ class MessageListener extends Thread{
 				/* 중복확인 */
 				else if(m[0].equals(overTag)) {
 					overlapCheck(m[1]);
+				}
+				
+				else if(m[0].equals(pwTag)) {
+					pwCheck(m[1]);
 				}
 				
 				/* 회원정보 조회 */
@@ -251,6 +256,19 @@ class MessageListener extends Thread{
 			JOptionPane.showMessageDialog(null, "이미 존재하는 닉네임/아이디 입니다", "중복 확인", JOptionPane.ERROR_MESSAGE);
 			client.jf.nickname.setText("");
 			client.jf.id.setText("");
+		}
+	}
+	
+	void pwCheck(String _m) {
+		if(_m.equals("OKAY")) {	//사용 가능
+			System.out.println("[Client] 비밀번호 사용 가능");
+			JOptionPane.showMessageDialog(null, "사용 가능한 비밀번호 입니다", "비밀번호 확인", JOptionPane.INFORMATION_MESSAGE);
+		}
+		
+		else {				//사용 불가능
+			System.out.println("[Client] 비밀번호 사용 불가능");
+			JOptionPane.showMessageDialog(null, "사용 불가능한 비밀번호 입니다", "비밀번호 확인", JOptionPane.ERROR_MESSAGE);
+			client.jf.pw.setText("");
 		}
 	}
 	
