@@ -129,8 +129,9 @@ class MessageListener extends Thread{
 					overlapCheck(m[1]);
 				}
 				
+				/* 비밀번호 유효성 검사 */
 				else if(m[0].equals(pwTag)) {
-					psCheck(m[1]);
+					pwCheck(m[1]);
 				}
 				
 				/* 회원정보 조회 */
@@ -259,18 +260,19 @@ class MessageListener extends Thread{
 		}
 	}
 	
-	void psCheck(String _m) {
-		if(_m.equals("OKAY")) {	//사용 가능
-			System.out.println("[Client] 비밀번호 사용 가능");
-			JOptionPane.showMessageDialog(null, "사용 가능한 비밀번호 입니다", "비밀번호 확인", JOptionPane.INFORMATION_MESSAGE);
-		}
-		
-		else {				//사용 불가능
-			System.out.println("[Client] 비밀번호 사용 불가능");
-			JOptionPane.showMessageDialog(null, "사용 불가능한 비밀번호 입니다", "비밀번호 확인", JOptionPane.ERROR_MESSAGE);
-			client.jf.pw.setText("");
-		}
-	}
+	/* 비밀번호의 유효성을 확인하는 메소드*/
+	 void pwCheck(String _m) {
+	    if(_m.equals("OKAY")) {   //사용 가능
+	        System.out.println("[Client] 비밀번호 사용 가능");
+	        JOptionPane.showMessageDialog(null, "사용 가능한 비밀번호 입니다", "비밀번호 확인", JOptionPane.INFORMATION_MESSAGE);
+	    }
+	      
+	    else { //사용 불가능
+	        System.out.println("[Client] 비밀번호 사용 불가능");
+	        JOptionPane.showMessageDialog(null, "다음 조건을 만족해야 합니다 \n8자 이상, 특수문자 포함, 대,소문자 포함", "비밀번호 확인", JOptionPane.ERROR_MESSAGE);
+	        client.jf.pw.setText("");
+	    }
+	 }
 	
 	/* 내 정보를 확인하는 메소드 */
 	void viewMyInfo(String m1, String m2, String m3) {
