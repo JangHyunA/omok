@@ -86,55 +86,57 @@ public class Database {
 		return flag;	//flag 반환
 	}
 	
-	boolean passwordCheck(String pass) {
-		boolean flag = false;  // 비밀번호 안전 확인 
-		String valid = "^(?=.*?[!?@#$^*+=-]).{8,}$";
-		try {
-			if (pass.matches(valid)) {
-				flag = true;		// 안전하지않음
-			}
-			else {
-				flag = false;
-			}
-		}catch(Exception e) {
-			System.out.println("[Server] 비밀번호 유효성 검사 실패 > "+ e.toString());
-		}
-		return flag;	
-		
-	}
 	//아이디나 닉네임이 중복되었는지 확인해주는 메소드. 중복 값이 존재하면 false, 존재하지 않으면 true를 반환한다.
-	boolean overCheck(String _a, String _v) {
-		boolean flag = false;	//참거짓을 반환할 flag 변수. 초기값은 false
-			
-		//att는 속성(아이디, 닉네임)을 구분하고, val은 확인할 값이 초기화.
-		String att = _a;
-		String val = _v;
-			
-		try {
-			//member 테이블에 존재하는 아이디(혹은 닉네임)를 모두 찾는다.
-			String selcectStr = "SELECT " + att + " FROM member";
-			ResultSet result = stmt.executeQuery(selcectStr);
-				
-			int count = 0;
-			while(result.next()) {
-				//조회한 아이디(혹은 닉네임)과 val을 비교.
-				if(!val.equals(result.getString(att))) {	//val과 같은 것이 존재하면 flag를 true로 변경한다.
-					flag = true;
-				}
-					
-				else {	//val과 같은 것이 존재하지 않으면 flag를 false로 변경한다.
-					flag = false;
-					break;
-				}
-				count++;
-			}
-			System.out.println("[Server] 중복 확인 성공");	//정상적으로 수행되었을 때 성공을 콘솔로 알린다.
-		} catch(Exception e) {	//정상적으로 수행하지 못하면 실패를 콘솔로 알린다.
-			System.out.println("[Server] 중복 확인 실패 > " + e.toString());
-		}
-			
-		return flag;	//flag 반환
-	}
+    boolean overCheck(String _a, String _v) {
+       boolean flag = true;   //참거짓을 반환할 flag 변수. 초기값은 false
+       
+       //att는 속성(아이디, 닉네임)을 구분하고, val은 확인할 값이 초기화.
+       String att = _a; // id인지 name 인지 
+       String val = _v; 
+       
+       try {
+          System.out.println(att);
+          //member 테이블에 존재하는 아이디(혹은 닉네임)를 모두 찾는다.
+          String selcectStr = "SELECT " + att + " FROM member";
+          ResultSet result = stmt.executeQuery(selcectStr);  //하나의 컬럼 
+          int count = 0;
+          if(!result.next()) {   // 컬럼이 존재하지 않는다면
+             flag= true;   // 비어 있다면 중복된 아이디 또는 닉네임이 없음
+          }else {
+             do {
+                if(val.equals(result.getString(att))) {   //val과 같은 것이 존재하면 flag를 false로 변경한다.
+                   flag = false; // 사용가능한 닉네임.아이디
+                   break;
+                }
+             }while (result.next());
+          }
+          count++;
+          System.out.println("[Server] 중복 확인 성공 (중복여부는 아직 미정)-> Server에서 알려줌 ");   //정상적으로 수행되었을 때 성공을 콘솔로 알린다.
+       } catch(Exception e) {   //정상적으로 수행하지 못하면 실패를 콘솔로 알린다.
+          System.out.println("[Server] 중복 확인 실패 > " + e.toString());
+       }
+       
+       return flag;   //flag 반환
+    }
+	
+ // 비밀번호의 유효성 검사를 확인해주는 메소드
+    boolean passwordCheck(String pass) {
+       boolean flag = false;  // 비밀번호 안전 확인 
+       String valid = "^(?=.*[a-z])(?=.*[A-Z])(?=.*[!?@#$^*+=-]).{8,}$";
+       try {
+          if (pass.matches(valid)) {
+             flag = true;      
+          }
+          else {
+             flag = false;
+          }
+       System.out.println("[Server] 비밀번호 유효성 검사 성공");
+       }catch(Exception e) {
+          System.out.println("[Server] 비밀번호 유효성 검사 실패 > "+ e.toString());
+       }
+       return flag;   
+       
+    }
 	
 	//데이터베이스에 저장된 자신의 정보를 조회하는 메소드. 조회한 정보들을 String 형태로 반환한다.
 	String viewInfo(String _nn) {
