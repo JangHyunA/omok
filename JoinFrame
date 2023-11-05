@@ -3,6 +3,11 @@ package omok;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.regex.Pattern;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.JProgressBar;
+
 
 //회원가입 기능을 수행하는 인터페이스
 public class JoinFrame extends JFrame{
@@ -25,6 +30,12 @@ public class JoinFrame extends JFrame{
 	JTextField post = new JTextField();
 	JTextField email = new JTextField();
 	
+	/* 비밀번호 강도 표시용 레이블 */
+    JLabel pwStrengthLabel = new JLabel("비밀번호 강도");
+    
+    /* 비밀번호 강도 표시기 */
+    JProgressBar pwStrengthIndicator = new JProgressBar(0, 100);
+	
 	/* Button */
 	JButton nnolBtn = new JButton("확인");
 	JButton idolBtn = new JButton("확인");
@@ -37,7 +48,7 @@ public class JoinFrame extends JFrame{
 	final String joinTag = "JOIN";	//회원가입 기능 태그
 	final String overTag = "OVER";	//중복확인 기능 태그
 	final String pwTag = "SAFE";	//비밀번호 유효성 태그
-	
+		
 	JoinFrame(Client _c) {
 		c = _c;
 		
@@ -66,9 +77,14 @@ public class JoinFrame extends JFrame{
 		joinBtn.setPreferredSize(new Dimension(135, 30));
 		cancelBtn.setPreferredSize(new Dimension(135, 30));
 		
-		/* Panel 추가 작업 */
+		/* 비밀번호 강도 표시기 설정 */
+        pwStrengthLabel.setPreferredSize(new Dimension(100, 30));
+        pwStrengthIndicator.setPreferredSize(new Dimension(170, 30));
+        pwStrengthIndicator.setStringPainted(true);
+        
+        /* Panel 추가 작업 */
 		setContentPane(panel);	//panel을 기본 컨테이너로 설정
-		
+
 		panel.add(nameL);
 		panel.add(name);
 		
@@ -83,6 +99,8 @@ public class JoinFrame extends JFrame{
 		panel.add(pwL);
 		panel.add(pw);
 		panel.add(psolBtn);
+		panel.add(pwStrengthLabel);
+        panel.add(pwStrengthIndicator);
 		
 		panel.add(postL);
 		panel.add(post);
@@ -130,11 +148,72 @@ public class JoinFrame extends JFrame{
 			}
 		});
 		
-		setSize(310, 300);
+		/* 비밀번호 강도 표시기 이벤트 리스너 */
+        pw.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                updateStrengthIndicator();
+            }
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                updateStrengthIndicator();
+            }
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                updateStrengthIndicator();
+            }
+        });
+		
+		setSize(310, 330);
 		setLocationRelativeTo(null);
 		setResizable(false);
 	}
 	
+	// 비밀번호 강도 표시를 업데이트하는 함수
+    private void updateStrengthIndicator() {
+        String password = String.valueOf(pw.getPassword());
+        int strength = calculatePasswordStrength(password);
+
+        // 표시의 값과 색상 업데이트
+        pwStrengthIndicator.setValue(strength);
+        if (strength < 50) {
+            pwStrengthIndicator.setForeground(Color.RED);
+        } else if (strength < 80) {
+            pwStrengthIndicator.setForeground(Color.ORANGE);
+        } else {
+            pwStrengthIndicator.setForeground(Color.GREEN);
+        }
+    }
+
+    // 비밀번호 강도를 계산하는 함수 (기준을 조정할 수 있습니다)
+    private int calculatePasswordStrength(String password) {
+        int strength = 0;
+
+        // - 최소 8자 이상
+        // - 적어도 하나의 대문자 포함
+        // - 적어도 하나의 소문자 포함
+        // - 적어도 하나의 숫자 포함
+        // - 적어도 하나의 특수 문자 포함
+
+        if (password.length() >= 8) {
+            strength += 50;
+        }
+        if (Pattern.compile("[A-Z]").matcher(password).find()) {
+            strength += 30;
+        }
+        if (Pattern.compile("[a-z]").matcher(password).find()) {
+            strength += 30;
+        }
+        if (Pattern.compile("\\d").matcher(password).find()) {
+            strength += 30;
+        }
+        if (Pattern.compile("[!@#$%^&*]").matcher(password).find()) {
+            strength += 30;
+        }
+
+        return Math.min(strength, 100); // 강도를 100으로 제한
+    }
+    
 	/* Button 이벤트 리스너 */
 	class ButtonListener implements ActionListener{
 		@Override
