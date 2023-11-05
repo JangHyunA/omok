@@ -147,18 +147,16 @@ public class GameFrame extends JFrame{
 	            }
 			}
         });
-        
+       
         // 채팅 수신 스레드
         new Thread(new Runnable() {
             @Override
             public void run() {
                 String message;
                 try {
-                	DataInputStream reader = new DataInputStream(socket.getInputStream());
-                    while (true) {
+                    while ((message = reader.readLine()) != null) {
                         // 서버로부터 수신한 메시지를 처리 (예: 화면에 표시)
-    	                writer.println("CHAT//" + reader.readUTF());
-                    	chatTextArea.append("상대방: " +reader.readUTF() + "\n");
+                        chatTextArea.append("상대방: " + message + "\n");
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
