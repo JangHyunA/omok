@@ -297,7 +297,7 @@ public class JoinFrame extends JFrame{
 			for(int i=0; i<pw.getPassword().length; i++) {
 				upass = upass + pw.getPassword()[i];
 			}
-			String upwcon = "";
+			String upwcon = String.valueOf(pwConfirm.getPassword());
 			String upost = post.getText();
 			String uemail = email.getText();
 			
