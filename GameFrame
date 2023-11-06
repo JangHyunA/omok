@@ -251,6 +251,7 @@ public class GameFrame extends JFrame{
 			else if(b.getText().equals("기권하기")) {
 				c.sendMsg(loseTag + "//");	//서버에 패배 태그 전송
 				dispose();					//인터페이스 닫음
+				remove();
 				c.mf.setVisible(true);
 			}
 		}
