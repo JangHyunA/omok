@@ -80,6 +80,7 @@ class MessageListener extends Thread{
 	final String joinTag = "JOIN";		//회원가입
 	final String overTag = "OVER";		//중복확인
 	final String pwTag = "SAFE";		//비밀번호 유효성
+	final String postTag = "POST";
 	final String viewTag = "VIEW";		//회원정보조회
 	final String changeTag = "CHANGE";	//회원정보변경
 	final String rankTag = "RANK";		//전적조회(전체회원)
@@ -88,6 +89,7 @@ class MessageListener extends Thread{
 	final String uroomTag = "UROOM";	//방유저
 	final String eroomTag = "EROOM";	//방입장
 	final String cuserTag = "CUSER";	//접속유저
+	final String chatTag = "CHAT";
 	final String searchTag = "SEARCH";	//전적조회(한명)
 	final String omokTag = "OMOK";		//오목
 	final String blackTag = "BLACK";	//검은색 돌
@@ -132,6 +134,11 @@ class MessageListener extends Thread{
 				/* 비밀번호 유효성 검사 */
 				else if(m[0].equals(pwTag)) {
 					pwCheck(m[1]);
+				}
+				
+				
+				else if(m[0].equals(postTag)) {
+					postCheck(m[1]);
 				}
 				
 				/* 회원정보 조회 */
@@ -182,6 +189,11 @@ class MessageListener extends Thread{
 				/* 전적 조회 */
 				else if(m[0].equals(searchTag)) {
 					searchRank(m[1]);
+				}
+				
+				/* 채팅 기능 */
+				else if(m[0].equals(chatTag)) {
+					chatt(m[1]);
 				}
 				
 				/* 오목 */
@@ -273,6 +285,19 @@ class MessageListener extends Thread{
 	        client.jf.pw.setText("");
 	    }
 	 }
+	 
+	 void postCheck(String _m) {
+			if(_m.equals("OKAY")){
+				System.out.println("[Client] 우편번호 검색 완료");
+				JOptionPane.showMessageDialog(null, "우편번호가 검색되었습니다", "우편 번호 확인", JOptionPane.INFORMATION_MESSAGE);
+			}
+			
+			else {
+				System.out.println("[Client] 우편번호 검색 오류");
+				JOptionPane.showMessageDialog(null,"우편 번호가 검색되지 않았습니다","우편 번호 확인",JOptionPane.ERROR_MESSAGE);
+				client.jf.post.setText("");
+			}
+	}
 	
 	/* 내 정보를 확인하는 메소드 */
 	void viewMyInfo(String m1, String m2, String m3) {
@@ -372,6 +397,13 @@ class MessageListener extends Thread{
 		if(!_m.equals("FAIL")) {	//전적 조회 성공
 			client.srf.setVisible(true);
 			client.srf.l.setText(_m);
+		}
+	}
+	
+	/* 채팅 기능 메소드 */
+	void chatt(String _m) {
+		if(_m !=null) {
+			client.gf.chatTextArea.append("상대방:"+_m+"\n");
 		}
 	}
 	
