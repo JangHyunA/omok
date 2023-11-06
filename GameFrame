@@ -37,6 +37,8 @@ public class GameFrame extends JFrame{
 	
 	Client c = null;
 	
+	int Port;
+	
 	final String searchTag = "SEARCH";	//전적 조회 기능 태그
 	final String rexitTag = "REXIT";	//방 퇴장 기능 태그
 	final String omokTag = "OMOK";		//오목 기능 태그
@@ -46,9 +48,12 @@ public class GameFrame extends JFrame{
 	final String loseTag = "LOSE";		//패배 태그
 	
 	/* Socket과 입출력 스트림 */
+	ServerSocket svr_socket;
     Socket socket;
     BufferedReader reader;
     PrintWriter writer;
+    
+    JTextArea chatTextArea;
 	
 	GameFrame(Client _c) {
 		c = _c;
@@ -95,7 +100,7 @@ public class GameFrame extends JFrame{
 		eastPanel.add(la3);
 		
 		// 채팅창 생성
-		JTextArea chatTextArea = new JTextArea();
+		chatTextArea = new JTextArea();
 		chatTextArea.setEditable(false); // 편집 불가능하도록 설정
 
 		// JScrollPane으로 채팅창 감싸기
@@ -123,9 +128,10 @@ public class GameFrame extends JFrame{
         try {
         	socket = new Socket("localhost", 1228); // 서버 주소와 포트번호를 실제 값으로 변경
            	reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            writer = new PrintWriter(socket.getOutputStream(), true);
+           	writer = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())), true);
             // 서버와 연결한 후 스트림 초기화
        	} catch (IOException e) {
+       		System.out.println("클라이언트의 소켓 오류 // 접속 오류 "+ e.toString());
        		e.printStackTrace();
        	}
 
@@ -134,21 +140,22 @@ public class GameFrame extends JFrame{
             @Override
             public void actionPerformed(ActionEvent e) {
                 sendMessage(chatInput.getText());
-                chatInput.setText(""); // 입력 필드 지우기
+                // chatInput.setText(""); // 입력 필드 지우기
             }
 	
-			private void sendMessage(String message) {
-				if (!message.isEmpty()) {
-	                // 메시지를 서버로 전송
-	                writer.println("CHAT//" + message);
-	                chatInput.setText(""); // 입력 필드 초기화
-	                // 채팅창에 보낸 메시지 표시
-	                chatTextArea.append("나: " + message + "\n");
-	            }
-			}
+            private void sendMessage(String message) {
+                // 메시지를 서버로 전송
+			if (!message.isEmpty()) {
+    					// Client -> 서버 전송
+    					c.sendMsg("CHAT//"+ message);
+				}
+                chatInput.setText(""); // 입력 필드 초기화
+                // 채팅창에 보낸 메시지 표시
+                chatTextArea.append("나: " + message + "\n");
+            }
         });
        
-        // 채팅 수신 스레드
+        /*
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -163,6 +170,7 @@ public class GameFrame extends JFrame{
                 }
             }
         }).start();
+        */
 		
 		/* Button 이벤트 리스너 추가 */
 		ButtonListener bl = new ButtonListener();
