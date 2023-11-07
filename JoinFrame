@@ -33,7 +33,6 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 public class JoinFrame extends JFrame{
-
 	   /* Panel */
 	   JPanel panel = new JPanel();
 	   
@@ -56,9 +55,9 @@ public class JoinFrame extends JFrame{
        JTextField id = new JTextField();
        JPasswordField pw = new JPasswordField();
        JPasswordField pwConfirm = new JPasswordField();
-       JTextField post = new JTextField();
-       JTextField road = new JTextField();
-       JTextField detail = new JTextField();
+       static JTextField post = new JTextField();
+       static JTextField road = new JTextField();
+       static JTextField detail = new JTextField();
        JTextField email = new JTextField();
 
        /* 비밀번호 강도 표시기 */
@@ -331,59 +330,7 @@ public class JoinFrame extends JFrame{
         return Math.min(strength, 100); // 강도를 100으로 제한
     }
 
-      private void searchAddress() {
-    	    try {
-    	        String serviceKey = "isA%2Fdo3wBhMF7rTWwSJP93HKC%2BEGgHbcqyu7mBvIZonRAR8%2BmM4CDX9B%2BvTbC8gYwH2B4kqQPWydMtjljUEHZA%3D%3D";
-    	        String searchSe = "dong";
-    	        String srchwrd = URLEncoder.encode(detail.getText(), "UTF-8");
-    	        String countPerPage = "10";
-    	        String currentPage = "1";
-
-    	        String urlString = "http://openapi.epost.go.kr/postal/retrieveNewAdressAreaCdService/retrieveNewAdressAreaCdService/getNewAddressListAreaCd";
-    	        urlString += "?serviceKey=" + serviceKey;
-    	        urlString += "&searchSe=" + searchSe;
-    	        urlString += "&srchwrd=" + srchwrd;
-    	        urlString += "&countPerPage=" + countPerPage;
-    	        urlString += "&currentPage=" + currentPage;
-
-    	        URL url = new URL(urlString);
-
-    	        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-    	        conn.setRequestMethod("GET");
-    	        conn.setRequestProperty("Content-type", "application/xml");
-
-    	        int responseCode = conn.getResponseCode();
-    	        if (responseCode == 200) {
-    	            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-    	            DocumentBuilder builder = factory.newDocumentBuilder();
-    	            Document document = builder.parse(conn.getInputStream());
-
-    	            NodeList itemList = document.getElementsByTagName("item");
-    	            if (itemList != null && itemList.getLength() > 0) {
-    	                Element firstItem = (Element) itemList.item(0);
-    	                String postCode = firstItem.getElementsByTagName("postCd").item(0).getTextContent();
-    	                String roadAddress = firstItem.getElementsByTagName("lnmAdres").item(0).getTextContent();
-    	                String detailAddress = firstItem.getElementsByTagName("rnAdres").item(0).getTextContent();
-
-    	                post.setText(postCode);
-    	                road.setText(roadAddress);
-    	                detail.setText(detailAddress);
-    	            } else {
-    	                post.setText("");
-    	                road.setText("");
-    	                detail.setText("");
-    	            }
-    	        } else {
-    	            System.out.println("HTTP 오류 코드: " + responseCode);
-    	        }
-
-    	        conn.disconnect();
-    	    } catch (Exception e) {
-    	        e.printStackTrace();
-    	    }
-    	}
-
-    /* Button 이벤트 리스너 */
+      /* Button 이벤트 리스너 */
     class ButtonListener implements ActionListener{
        @Override
        public void actionPerformed(ActionEvent e) {
@@ -436,22 +383,30 @@ public class JoinFrame extends JFrame{
        }
     }
 
-    public static void setzipNoField(String address) {
+    public static void setzipNoField(String selectedAddress) {
         try {
-           String zipNo = address.substring(6, 11);
-           postBtn.setText(zipNo);
+           String zipNo = selectedAddress.substring(6, 11);
+           post.setText(zipNo);
         } catch (Exception e) {
            e.printStackTrace();
         }
      }
 
-	public static void setAddressField(String selectedAddress) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public static void setExtraAddressFiled(String selectedAddress) {
-		// TODO Auto-generated method stub
-		
-	}
+    public static void setAddressField(String selectedAddress) {
+        try {
+            String searchKeyword = "도로명주소: ";
+            int startIndex = selectedAddress.indexOf(searchKeyword);
+            if (startIndex != -1) {
+                String rnAdres = selectedAddress.substring(startIndex + searchKeyword.length());
+                road.setText(rnAdres);
+            } else {
+                // "도로명주소:"를 찾지 못한 경우 또는 예외 처리
+                // 예를 들어 에러 메시지를 설정할 수 있습니다.
+                road.setText(""); // 빈 문자열 설정 또는 원하는 다른 처리 수행
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            road.setText(""); // 예외 발생 시 빈 문자열 설정 또는 원하는 다른 처리 수행
+        }
+    }
  }
