@@ -70,7 +70,7 @@ public class JoinFrame extends JFrame{
       JButton idolBtn = new JButton("확인");
       JButton psolBtn = new JButton("확인");
       JButton checkPwBtn = new JButton("확인");
-      JButton postBtn = new JButton("검색");
+      static JButton postBtn = new JButton("검색");
       JButton imgBtn = new JButton("이미지 선택");
       JButton joinBtn = new JButton("가입하기");
       JButton cancelBtn = new JButton("가입취소");
@@ -256,7 +256,8 @@ public class JoinFrame extends JFrame{
         postBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                searchAddress();
+            	AddressSearchFrame adF = new AddressSearchFrame();
+                adF.setVisible(true);
             }
         });
 
@@ -439,7 +440,7 @@ public class JoinFrame extends JFrame{
     public static void setzipNoField(String address) {
         try {
            String zipNo = address.substring(6, 11);
-           zipNoField.setText(zipNo);
+           postBtn.setText(zipNo);
         } catch (Exception e) {
            e.printStackTrace();
         }
