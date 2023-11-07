@@ -20,7 +20,7 @@ import org.xml.sax.InputSource;
 
 public class ApiExplorer {
     public static void main(String[] args) throws IOException {
-        StringBuilder urlBuilder = new StringBuilder("http://openapi.epost.go.kr:80/postal/retrieveNewAdressAreaCdService?_wadl&type=xml"); /*URL*/
+        StringBuilder urlBuilder = new StringBuilder("http://openapi.epost.go.kr/postal/retrieveNewAdressAreaCdService/retrieveNewAdressAreaCdService/getNewAddressListAreaCd"); /*URL*/
         urlBuilder.append("?" + URLEncoder.encode("serviceKey","UTF-8") + "=isA%2Fdo3wBhMF7rTWwSJP93HKC%2BEGgHbcqyu7mBvIZonRAR8%2BmM4CDX9B%2BvTbC8gYwH2B4kqQPWydMtjljUEHZA%3D%3D"); /*Service Key*/
         urlBuilder.append("&" + URLEncoder.encode("searchSe","UTF-8") + "=" + URLEncoder.encode("dong", "UTF-8")); /*dong : 동(읍/면)명road :도로명[default]post : 우편번호*/
         urlBuilder.append("&" + URLEncoder.encode("srchwrd","UTF-8") + "=" + URLEncoder.encode("주월동 408-1", "UTF-8")); /*검색어*/
