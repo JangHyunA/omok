@@ -1,217 +1,265 @@
 package omok;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Image;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLEncoder;
 import java.util.regex.Pattern;
+
+import javax.swing.AbstractButton;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JPasswordField;
+import javax.swing.JProgressBar;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import javax.swing.JProgressBar;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
-//회원가입 기능을 수행하는 인터페이스
 public class JoinFrame extends JFrame{
-   /* Panel */
-   JPanel panel = new JPanel();
-   
-   /* Label */
-   JLabel nameL = new JLabel("이름");
-   JLabel nicknameL = new JLabel("닉네임");
-   JLabel idL = new JLabel("아이디");
-   JLabel pwL = new JLabel("비밀번호");
-   JLabel pwstL = new JLabel("비밀번호 강도");
-   JLabel pwConfirmL = new JLabel("비밀번호 확인");
-   JLabel postL = new JLabel("우편번호");
-   JLabel emailL = new JLabel("이메일");
-   JLabel proImgL = new JLabel("프로필 이미지 넣는 곳");
-   
-   /* TextField */
-   JTextField name = new JTextField();
-   JTextField nickname = new JTextField();
-   JTextField id = new JTextField();
-   JPasswordField pw = new JPasswordField();
-   JPasswordField pwConfirm = new JPasswordField();
-   JTextField post = new JTextField();
-   JTextField email = new JTextField();
-    
-    /* 비밀번호 강도 표시기 */
-    JProgressBar pwstIndicator = new JProgressBar(0, 100);
-   
-   /* Button */
-   JButton nnolBtn = new JButton("확인");
-   JButton idolBtn = new JButton("확인");
-   JButton psolBtn = new JButton("확인");
-   JButton checkPwBtn = new JButton("확인");
-   JButton imgBtn = new JButton("이미지 선택");
-   JButton joinBtn = new JButton("가입하기");
-   JButton cancelBtn = new JButton("가입취소");
-   
-   Client c = null;
-   
-   final String joinTag = "JOIN";   //회원가입 기능 태그
-   final String overTag = "OVER";   //중복확인 기능 태그
-   final String pwTag = "SAFE";   //비밀번호 유효성 태그
-      
-   JoinFrame(Client _c) {
-      c = _c;
-      
-      setTitle("회원가입");
-      
-      /* Label 크기 작업 */
-      nameL.setPreferredSize(new Dimension(100, 30));
-      nicknameL.setPreferredSize(new Dimension(100, 30));
-      idL.setPreferredSize(new Dimension(100, 30));
-      pwL.setPreferredSize(new Dimension(100, 30));
-      pwConfirmL.setPreferredSize(new Dimension(100, 30));
-      postL.setPreferredSize(new Dimension(100, 30));
-      emailL.setPreferredSize(new Dimension(100, 30));
-      
-      /* TextField 크기 작업 */
-      name.setPreferredSize(new Dimension(250, 30));
-      nickname.setPreferredSize(new Dimension(185, 30));
-      id.setPreferredSize(new Dimension(185, 30));
-      pw.setPreferredSize(new Dimension(185, 30));
-      pwConfirm.setPreferredSize(new Dimension(185, 30));
-      post.setPreferredSize(new Dimension(250, 30));
-      email.setPreferredSize(new Dimension(250, 30));
-      
-      /* Button 크기 작업 */
-      nnolBtn.setPreferredSize(new Dimension(60, 30));
-      idolBtn.setPreferredSize(new Dimension(60, 30));
-      psolBtn.setPreferredSize(new Dimension(60, 30));
-      checkPwBtn.setPreferredSize(new Dimension(60, 30));
-      imgBtn.setPreferredSize(new Dimension(270, 30));
-      joinBtn.setPreferredSize(new Dimension(135, 30));
-      cancelBtn.setPreferredSize(new Dimension(135, 30));
-      
-      /* 비밀번호 강도 표시기 설정 */
-      pwstL.setPreferredSize(new Dimension(100, 30));
-      pwstIndicator.setPreferredSize(new Dimension(250, 30));
-        pwstIndicator.setStringPainted(true);
-        
-        /* 프로필 이미지 설정 */
-        proImgL.setPreferredSize(new Dimension(290, 300));
-        proImgL.setHorizontalAlignment(SwingConstants.CENTER); // 레이블 내용 가운데 정렬
-        
-        /* Panel 추가 작업 */
-      setContentPane(panel);   //panel을 기본 컨테이너로 설정
+	   private static AbstractButton zipNoField;
 
-      panel.add(nameL);
-      panel.add(name);
+	   /* Panel */
+	   JPanel panel = new JPanel();
+	   
+	   /* Label */
+	   JLabel nameL = new JLabel("이름");
+	   JLabel nicknameL = new JLabel("닉네임");
+	   JLabel idL = new JLabel("아이디");
+	   JLabel pwL = new JLabel("비밀번호");
+	   JLabel pwstL = new JLabel("비밀번호 강도");
+	   JLabel pwConfirmL = new JLabel("비밀번호 확인");
+	   JLabel postL = new JLabel("우편번호");
+       JLabel roadL = new JLabel("도로명주소");
+       JLabel detailL = new JLabel("상세주소");
+       JLabel emailL = new JLabel("이메일");
+       JLabel proImgL = new JLabel("프로필 이미지 넣는 곳");
+       
+       /* TextField */
+       JTextField name = new JTextField();
+       JTextField nickname = new JTextField();
+       JTextField id = new JTextField();
+       JPasswordField pw = new JPasswordField();
+       JPasswordField pwConfirm = new JPasswordField();
+       JTextField post = new JTextField();
+       JTextField road = new JTextField();
+       JTextField detail = new JTextField();
+       JTextField email = new JTextField();
+
+       /* 비밀번호 강도 표시기 */
+       JProgressBar pwstIndicator = new JProgressBar(0, 100);
       
-      panel.add(nicknameL);
-      panel.add(nickname);
-      panel.add(nnolBtn);
+      /* Button */
+      JButton nnolBtn = new JButton("확인");
+      JButton idolBtn = new JButton("확인");
+      JButton psolBtn = new JButton("확인");
+      JButton checkPwBtn = new JButton("확인");
+      JButton postBtn = new JButton("검색");
+      JButton imgBtn = new JButton("이미지 선택");
+      JButton joinBtn = new JButton("가입하기");
+      JButton cancelBtn = new JButton("가입취소");
       
-      panel.add(idL);
-      panel.add(id);
-      panel.add(idolBtn);
+      Client c = null;
       
-      panel.add(pwL);
-      panel.add(pw);
-      panel.add(psolBtn);
-      panel.add(pwstL);
-      panel.add(pwstIndicator);
-      panel.add(pwConfirmL);
-      panel.add(pwConfirm);
-      panel.add(checkPwBtn);
-      
-      panel.add(postL);
-      panel.add(post);
-      
-      panel.add(emailL);
-      panel.add(email);
-      
-      panel.add(proImgL);
-      panel.add(imgBtn);
-      
-      panel.add(cancelBtn);
-      panel.add(joinBtn);
-      
-      /* Button 이벤트 리스너 추가 */
-      ButtonListener bl = new ButtonListener();
-      
-      cancelBtn.addActionListener(new ActionListener() {
-          @Override
-          public void actionPerformed(ActionEvent e) {
-              // 모든 입력 필드 리셋
-              name.setText("");
-              nickname.setText("");
-              id.setText("");
-              pw.setText("");
-              pwConfirm.setText("");
-              post.setText("");
-              email.setText("");
-              proImgL.setIcon(null);
-              
-              dispose(); // 현재 회원가입 창 닫기
-          }
-      });
-      
-      joinBtn.addActionListener(bl);
-      
-      /* Button 이벤트 추가 */
-      nnolBtn.addActionListener(new ActionListener() {
-         @Override
-         public void actionPerformed(ActionEvent e) {
-            if(!nickname.getText().equals("")) {
-               System.out.println("[Client] 닉네임 중복 확인");
-               c.sendMsg(overTag + "//nickname//" + nickname.getText());   //서버에 태그와 함께 닉네임 전송
-            }
-         }
-      });
-      
-      idolBtn.addActionListener(new ActionListener() {
-         @Override
-         public void actionPerformed(ActionEvent e) {
-            if(!id.getText().equals("")) {
-               System.out.println("[Client] 아이디 중복 확인");
-               c.sendMsg(overTag + "//id//" + id.getText());   //서버에 태그와 함께 아이디 전송
-            }
-         }
-      });
-      
-      psolBtn.addActionListener(new ActionListener() {
-         @Override
-         public void actionPerformed(ActionEvent e) {
-            if(!pw.getPassword().toString().equals("")) {
-               System.out.println("[Client] 비밀번호 유효성 확인");
-               c.sendMsg(pwTag + "//pw//" +String.valueOf(pw.getPassword()));   //서버에 태그와 함께 비밀번호 전송
-            }
-         }
-      });
-      
-      /* 비밀번호 강도 표시기 이벤트 리스너 */
-        pw.getDocument().addDocumentListener(new DocumentListener() {
-            @Override
-            public void insertUpdate(DocumentEvent e) {
-                updateStrengthIndicator();
-            }
-            @Override
-            public void removeUpdate(DocumentEvent e) {
-                updateStrengthIndicator();
-            }
-            @Override
-            public void changedUpdate(DocumentEvent e) {
-                updateStrengthIndicator();
-            }
-        });
+      final String joinTag = "JOIN";   //회원가입 기능 태그
+      final String overTag = "OVER";   //중복확인 기능 태그
+      final String pwTag = "SAFE";   //비밀번호 유효성 태그
+         
+      JoinFrame(Client _c) {
+         c = _c;
+         
+         setTitle("회원가입");
+         
+         /* Label 크기 작업 */
+         nameL.setPreferredSize(new Dimension(100, 30));
+         nicknameL.setPreferredSize(new Dimension(100, 30));
+         idL.setPreferredSize(new Dimension(100, 30));
+         pwL.setPreferredSize(new Dimension(100, 30));
+         pwConfirmL.setPreferredSize(new Dimension(100, 30));
+         postL.setPreferredSize(new Dimension(100, 30));
+         roadL.setPreferredSize(new Dimension(100, 30));
+         detailL.setPreferredSize(new Dimension(100, 30));
+         emailL.setPreferredSize(new Dimension(100, 30));
+
+         /* TextField 크기 작업 */
+         name.setPreferredSize(new Dimension(250, 30));
+         nickname.setPreferredSize(new Dimension(185, 30));
+         id.setPreferredSize(new Dimension(185, 30));
+         pw.setPreferredSize(new Dimension(185, 30));
+         pwConfirm.setPreferredSize(new Dimension(185, 30));
+         post.setPreferredSize(new Dimension(185, 30));
+         road.setPreferredSize(new Dimension(250, 30));
+         detail.setPreferredSize(new Dimension(250, 30));
+         email.setPreferredSize(new Dimension(250, 30));
+
+         /* Button 크기 작업 */
+         nnolBtn.setPreferredSize(new Dimension(60, 30));
+         idolBtn.setPreferredSize(new Dimension(60, 30));
+         psolBtn.setPreferredSize(new Dimension(60, 30));
+         checkPwBtn.setPreferredSize(new Dimension(60, 30));
+         postBtn.setPreferredSize(new Dimension(60, 30));
+         imgBtn.setPreferredSize(new Dimension(270, 30));
+         joinBtn.setPreferredSize(new Dimension(135, 30));
+         cancelBtn.setPreferredSize(new Dimension(135, 30));
+
+         /* 비밀번호 강도 표시기 설정 */
+         pwstL.setPreferredSize(new Dimension(100, 30));
+         pwstIndicator.setPreferredSize(new Dimension(250, 30));
+           pwstIndicator.setStringPainted(true);
+           
+           /* 프로필 이미지 설정 */
+           proImgL.setPreferredSize(new Dimension(290, 300));
+           proImgL.setHorizontalAlignment(SwingConstants.CENTER); // 레이블 내용 가운데 정렬
+           
+           /* Panel 추가 작업 */
+          setContentPane(panel);   //panel을 기본 컨테이너로 설정
+
+          panel.add(nameL);
+          panel.add(name);
+         
+          panel.add(nicknameL);
+          panel.add(nickname);
+          panel.add(nnolBtn);
+         
+          panel.add(idL);
+          panel.add(id);
+          panel.add(idolBtn);
+         
+          panel.add(pwL);
+          panel.add(pw);
+          panel.add(psolBtn);
+          panel.add(pwstL);
+          panel.add(pwstIndicator);
+          panel.add(pwConfirmL);
+          panel.add(pwConfirm);
+          panel.add(checkPwBtn);
+
+         panel.add(postL);
+         panel.add(post);
+         panel.add(postBtn);
+
+         panel.add(roadL);
+         panel.add(road);
+         panel.add(detailL);
+         panel.add(detail);
+
+         panel.add(emailL);
+         panel.add(email);
+
+         panel.add(proImgL);
+         panel.add(imgBtn);
+
+         panel.add(cancelBtn);
+         panel.add(joinBtn);
+
+        /* Button 이벤트 리스너 추가 */
+        ButtonListener bl = new ButtonListener();
         
-        checkPwBtn.addActionListener(new ActionListener() {
+        cancelBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                String password = String.valueOf(pw.getPassword());
-                String confirmPassword = String.valueOf(pwConfirm.getPassword());
+                // 모든 입력 필드 리셋
+                name.setText("");
+                nickname.setText("");
+                id.setText("");
+                pw.setText("");
+                pwConfirm.setText("");
+                post.setText("");
+                road.setText("");
+                detail.setText("");
+                email.setText("");
+                proImgL.setIcon(null);
 
-                if (password.equals(confirmPassword)) {
-                    JOptionPane.showMessageDialog(null, "비밀번호가 일치합니다.", "확인", JOptionPane.INFORMATION_MESSAGE);
-                } else {
-                    JOptionPane.showMessageDialog(null, "비밀번호가 일치하지 않습니다.", "오류", JOptionPane.ERROR_MESSAGE);
-                }
+                dispose();
             }
         });
+
+        joinBtn.addActionListener(bl);
         
+        /* Button 이벤트 추가 */
+        nnolBtn.addActionListener(new ActionListener() {
+           @Override
+           public void actionPerformed(ActionEvent e) {
+              if(!nickname.getText().equals("")) {
+                 System.out.println("[Client] 닉네임 중복 확인");
+                 c.sendMsg(overTag + "//nickname//" + nickname.getText());   //서버에 태그와 함께 닉네임 전송
+              }
+           }
+        });
+        
+        idolBtn.addActionListener(new ActionListener() {
+           @Override
+           public void actionPerformed(ActionEvent e) {
+              if(!id.getText().equals("")) {
+                 System.out.println("[Client] 아이디 중복 확인");
+                 c.sendMsg(overTag + "//id//" + id.getText());   //서버에 태그와 함께 아이디 전송
+              }
+           }
+        });
+        
+        psolBtn.addActionListener(new ActionListener() {
+           @Override
+           public void actionPerformed(ActionEvent e) {
+              if(!pw.getPassword().toString().equals("")) {
+                 System.out.println("[Client] 비밀번호 유효성 확인");
+                 c.sendMsg(pwTag + "//pw//" +String.valueOf(pw.getPassword()));   //서버에 태그와 함께 비밀번호 전송
+              }
+           }
+        });
+        
+        /* 비밀번호 강도 표시기 이벤트 리스너 */
+          pw.getDocument().addDocumentListener(new DocumentListener() {
+              @Override
+              public void insertUpdate(DocumentEvent e) {
+                  updateStrengthIndicator();
+              }
+              @Override
+              public void removeUpdate(DocumentEvent e) {
+                  updateStrengthIndicator();
+              }
+              @Override
+              public void changedUpdate(DocumentEvent e) {
+                  updateStrengthIndicator();
+              }
+          });
+          
+          checkPwBtn.addActionListener(new ActionListener() {
+              @Override
+              public void actionPerformed(ActionEvent e) {
+                  String password = String.valueOf(pw.getPassword());
+                  String confirmPassword = String.valueOf(pwConfirm.getPassword());
+
+                  if (password.equals(confirmPassword)) {
+                      JOptionPane.showMessageDialog(null, "비밀번호가 일치합니다.", "확인", JOptionPane.INFORMATION_MESSAGE);
+                  } else {
+                      JOptionPane.showMessageDialog(null, "비밀번호가 일치하지 않습니다.", "오류", JOptionPane.ERROR_MESSAGE);
+                  }
+              }
+          });
+
+        postBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                searchAddress();
+            }
+        });
+
         imgBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 JFileChooser fileChooser = new JFileChooser();
@@ -234,103 +282,176 @@ public class JoinFrame extends JFrame{
             }
         });
       
-      setSize(380, 700);
+      setSize(380, 770);
       setLocationRelativeTo(null);
       setResizable(false);
    }
-   
+
    // 비밀번호 강도 표시를 업데이트하는 함수
-    private void updateStrengthIndicator() {
-        String password = String.valueOf(pw.getPassword());
-        int strength = calculatePasswordStrength(password);
+      private void updateStrengthIndicator() {
+          String password = String.valueOf(pw.getPassword());
+          int strength = calculatePasswordStrength(password);
 
-        // 표시의 값과 색상 업데이트
-        pwstIndicator.setValue(strength);
-        if (strength < 50) {
-           pwstIndicator.setForeground(Color.RED);
-        } else if (strength < 80) {
-           pwstIndicator.setForeground(Color.ORANGE);
-        } else {
-           pwstIndicator.setForeground(Color.GREEN);
-        }
-    }
+          // 표시의 값과 색상 업데이트
+          pwstIndicator.setValue(strength);
+          if (strength < 50) {
+             pwstIndicator.setForeground(Color.RED);
+          } else if (strength < 80) {
+             pwstIndicator.setForeground(Color.ORANGE);
+          } else {
+             pwstIndicator.setForeground(Color.GREEN);
+          }
+      }
 
-    // 비밀번호 강도를 계산하는 함수 (기준을 조정할 수 있습니다)
-    private int calculatePasswordStrength(String password) {
-        int strength = 0;
+      // 비밀번호 강도를 계산하는 함수 (기준을 조정할 수 있습니다)
+      private int calculatePasswordStrength(String password) {
+          int strength = 0;
 
-        // - 최소 8자 이상
-        // - 적어도 하나의 대문자 포함
-        // - 적어도 하나의 소문자 포함
-        // - 적어도 하나의 숫자 포함
-        // - 적어도 하나의 특수 문자 포함
+          // - 최소 8자 이상
+          // - 적어도 하나의 대문자 포함
+          // - 적어도 하나의 소문자 포함
+          // - 적어도 하나의 숫자 포함
+          // - 적어도 하나의 특수 문자 포함
 
         if (password.length() >= 8) {
-            strength += 50;
+            strength += 25;
         }
         if (Pattern.compile("[A-Z]").matcher(password).find()) {
-            strength += 30;
+            strength += 25;
         }
         if (Pattern.compile("[a-z]").matcher(password).find()) {
-            strength += 30;
+            strength += 25;
         }
         if (Pattern.compile("\\d").matcher(password).find()) {
-            strength += 30;
+            strength += 25;
         }
         if (Pattern.compile("[!@#$%^&*]").matcher(password).find()) {
-            strength += 30;
+            strength += 25;
         }
         return Math.min(strength, 100); // 강도를 100으로 제한
     }
-    
-   /* Button 이벤트 리스너 */
-   class ButtonListener implements ActionListener{
-      @Override
-      public void actionPerformed(ActionEvent e) {
-         JButton b = (JButton)e.getSource();
-         
-         /* TextField에 입력된 회원 정보들을 변수에 초기화 */
-         String uname = name.getText();
-         String unick = nickname.getText();
-         String uid = id.getText();
-         String upass = "";
-         for(int i=0; i<pw.getPassword().length; i++) {
-            upass = upass + pw.getPassword()[i];
-         }
-         String upwcon = String.valueOf(pwConfirm.getPassword());
-         String upost = post.getText();
-         String uemail = email.getText();
-         
-         /* 가입취소 버튼 이벤트 */
-         if(b.getText().equals("가입취소")) {
-            System.out.println("[Client] 회원가입 인터페이스 종료");
-            
-            // 모든 입력 필드 리셋
-              name.setText("");
-              nickname.setText("");
-              id.setText("");
-              pw.setText("");
-              pwConfirm.setText("");
-              post.setText("");
-              email.setText("");
-              proImgL.setIcon(null);
-            
-              dispose();   //인터페이스 닫음
-         }
-         
-         /* 가입하기 버튼 이벤트 */
-         else if(b.getText().equals("가입하기")) {
-            if(uname.equals("") || unick.equals("") || uid.equals("") || upass.equals("") || upwcon.equals("") ||upost.equals("") || uemail.equals("")) {
-               //모든 정보가 입력되지 않으면 회원가입 시도 실패
-               JOptionPane.showMessageDialog(null, "모든 정보를 기입해주세요", "회원가입 실패", JOptionPane.ERROR_MESSAGE);
-               System.out.println("[Client] 회원가입 실패 : 회원정보 미입력");
-            }
-            
-            else if(!uname.equals("") && !unick.equals("") && !uid.equals("") && !upass.equals("") && !upwcon.equals("") && !upost.equals("") && !uemail.equals("")) {
-               //회원가입 시도 성공
-               c.sendMsg(joinTag + "//" + uname + "//" + unick + "//" + uid + "//" + upass + "//" + upost + "//" + uemail);   //서버에 회원가입 정보 전송
-            }
-         }
-      }
-   }
-}
+
+      private void searchAddress() {
+    	    try {
+    	        String serviceKey = "isA%2Fdo3wBhMF7rTWwSJP93HKC%2BEGgHbcqyu7mBvIZonRAR8%2BmM4CDX9B%2BvTbC8gYwH2B4kqQPWydMtjljUEHZA%3D%3D";
+    	        String searchSe = "dong";
+    	        String srchwrd = URLEncoder.encode(detail.getText(), "UTF-8");
+    	        String countPerPage = "10";
+    	        String currentPage = "1";
+
+    	        String urlString = "http://openapi.epost.go.kr/postal/retrieveNewAdressAreaCdService/retrieveNewAdressAreaCdService/getNewAddressListAreaCd";
+    	        urlString += "?serviceKey=" + serviceKey;
+    	        urlString += "&searchSe=" + searchSe;
+    	        urlString += "&srchwrd=" + srchwrd;
+    	        urlString += "&countPerPage=" + countPerPage;
+    	        urlString += "&currentPage=" + currentPage;
+
+    	        URL url = new URL(urlString);
+
+    	        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+    	        conn.setRequestMethod("GET");
+    	        conn.setRequestProperty("Content-type", "application/xml");
+
+    	        int responseCode = conn.getResponseCode();
+    	        if (responseCode == 200) {
+    	            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+    	            DocumentBuilder builder = factory.newDocumentBuilder();
+    	            Document document = builder.parse(conn.getInputStream());
+
+    	            NodeList itemList = document.getElementsByTagName("item");
+    	            if (itemList != null && itemList.getLength() > 0) {
+    	                Element firstItem = (Element) itemList.item(0);
+    	                String postCode = firstItem.getElementsByTagName("postCd").item(0).getTextContent();
+    	                String roadAddress = firstItem.getElementsByTagName("lnmAdres").item(0).getTextContent();
+    	                String detailAddress = firstItem.getElementsByTagName("rnAdres").item(0).getTextContent();
+
+    	                post.setText(postCode);
+    	                road.setText(roadAddress);
+    	                detail.setText(detailAddress);
+    	            } else {
+    	                post.setText("");
+    	                road.setText("");
+    	                detail.setText("");
+    	            }
+    	        } else {
+    	            System.out.println("HTTP 오류 코드: " + responseCode);
+    	        }
+
+    	        conn.disconnect();
+    	    } catch (Exception e) {
+    	        e.printStackTrace();
+    	    }
+    	}
+
+    /* Button 이벤트 리스너 */
+    class ButtonListener implements ActionListener{
+       @Override
+       public void actionPerformed(ActionEvent e) {
+          JButton b = (JButton)e.getSource();
+          
+          /* TextField에 입력된 회원 정보들을 변수에 초기화 */
+          String uname = name.getText();
+          String unick = nickname.getText();
+          String uid = id.getText();
+          String upass = "";
+          for(int i=0; i<pw.getPassword().length; i++) {
+             upass = upass + pw.getPassword()[i];
+          }
+          String upwcon = String.valueOf(pwConfirm.getPassword());
+          String upost = post.getText();
+          String uemail = email.getText();
+
+          /* 가입취소 버튼 이벤트 */
+          if(b.getText().equals("가입취소")) {
+             System.out.println("[Client] 회원가입 인터페이스 종료");
+             
+             // 모든 입력 필드 리셋
+               name.setText("");
+               nickname.setText("");
+               id.setText("");
+               pw.setText("");
+               pwConfirm.setText("");
+               post.setText("");
+               road.setText("");
+               detail.setText("");
+               email.setText("");
+               proImgL.setIcon(null);
+               
+               dispose();
+          }
+          
+          /* 가입하기 버튼 이벤트 */
+          else if(b.getText().equals("가입하기")) {
+             if(uname.equals("") || unick.equals("") || uid.equals("") || upass.equals("") || upwcon.equals("") ||upost.equals("") || uemail.equals("")) {
+                //모든 정보가 입력되지 않으면 회원가입 시도 실패
+                JOptionPane.showMessageDialog(null, "모든 정보를 기입해주세요", "회원가입 실패", JOptionPane.ERROR_MESSAGE);
+                System.out.println("[Client] 회원가입 실패 : 회원정보 미입력");
+             }
+             
+             else if(!uname.equals("") && !unick.equals("") && !uid.equals("") && !upass.equals("") && !upwcon.equals("") && !upost.equals("") && !uemail.equals("")) {
+                //회원가입 시도 성공
+                c.sendMsg(joinTag + "//" + uname + "//" + unick + "//" + uid + "//" + upass + "//" + upost + "//" + uemail);   //서버에 회원가입 정보 전송
+             }
+          }
+       }
+    }
+
+    public static void setzipNoField(String address) {
+        try {
+           String zipNo = address.substring(6, 11);
+           zipNoField.setText(zipNo);
+        } catch (Exception e) {
+           e.printStackTrace();
+        }
+     }
+
+	public static void setAddressField(String selectedAddress) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public static void setExtraAddressFiled(String selectedAddress) {
+		// TODO Auto-generated method stub
+		
+	}
+ }
