@@ -33,7 +33,6 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 public class JoinFrame extends JFrame{
-	   private static AbstractButton zipNoField;
 
 	   /* Panel */
 	   JPanel panel = new JPanel();
