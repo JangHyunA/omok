@@ -77,7 +77,6 @@ public class AddressSearchFrame extends JDialog {
 	                  // 선택된 주소를 회원가입 창 주소에 설정
 	                  JoinFrame.setzipNoField(selectedAddress);
 	                  JoinFrame.setAddressField(selectedAddress);
-	                  JoinFrame.setExtraAddressFiled(selectedAddress);
 	                  dispose();
 	               }
 	            }
@@ -175,7 +174,7 @@ public class AddressSearchFrame extends JDialog {
 	            // XML 문자열 파싱
 	            Document doc = dBuilder.parse(new InputSource(new StringReader(xml)));
 	            
-	            // "lnmAdres" 엘리먼트(주소)를 가져오기
+	            // "lnmAdres" 엘리먼트(도로명주소)를 가져오기
 	            NodeList lnmAdresList = doc.getElementsByTagName("lnmAdres");
 	            // "zipNo" 엘리먼트(우편번호)를 가져오기
 	            NodeList zipNoList = doc.getElementsByTagName("zipNo");
@@ -184,10 +183,10 @@ public class AddressSearchFrame extends JDialog {
 	                Element lnmAdresElement = (Element) lnmAdresList.item(i);
 	                Element zipNoElement = (Element) zipNoList.item(i);
 	                
-	                String address = lnmAdresElement.getTextContent();
+	                String lnmAdres = lnmAdresElement.getTextContent();
 	                String zipNo = zipNoElement.getTextContent();
 	                
-	                addresses.add("우편번호: " + zipNo + ", 주소: " + address);
+	                addresses.add("우편번호: " + zipNo + ", 도로명주소: " + lnmAdres);
 	            }
 
 	            if (addresses.isEmpty()) {
