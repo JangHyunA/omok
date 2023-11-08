@@ -350,7 +350,6 @@ public class JoinFrame extends JFrame{
           String uroad = road.getText();
           String udetail = detail.getText();
           String uemail = email.getText();
-          // String uproImg = proImgL.getText();
 
           /* 가입취소 버튼 이벤트 */
           if(b.getText().equals("가입취소")) {
