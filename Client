@@ -11,7 +11,6 @@ public class Client {
 	/* 메시지 송신을 위한 필드 */
 	OutputStream os = null;
 	DataOutputStream dos = null;
-
 	
 	/* 각 프레임을 관리할 필드 */
 	MainFrame mf = null;
@@ -80,7 +79,7 @@ class MessageListener extends Thread{
 	final String joinTag = "JOIN";		//회원가입
 	final String overTag = "OVER";		//중복확인
 	final String pwTag = "SAFE";		//비밀번호 유효성
-	final String postTag = "POST";
+	final String postTag = "POST";		//우편번호
 	final String viewTag = "VIEW";		//회원정보조회
 	final String changeTag = "CHANGE";	//회원정보변경
 	final String rankTag = "RANK";		//전적조회(전체회원)
@@ -89,7 +88,7 @@ class MessageListener extends Thread{
 	final String uroomTag = "UROOM";	//방유저
 	final String eroomTag = "EROOM";	//방입장
 	final String cuserTag = "CUSER";	//접속유저
-	final String chatTag = "CHAT";
+	final String chatTag = "CHAT";		//채팅하기
 	final String searchTag = "SEARCH";	//전적조회(한명)
 	final String omokTag = "OMOK";		//오목
 	final String blackTag = "BLACK";	//검은색 돌
@@ -136,7 +135,7 @@ class MessageListener extends Thread{
 					pwCheck(m[1]);
 				}
 				
-				
+				/* 우편번호 */
 				else if(m[0].equals(postTag)) {
 					postCheck(m[1]);
 				}
@@ -191,7 +190,7 @@ class MessageListener extends Thread{
 					searchRank(m[1]);
 				}
 				
-				/* 채팅 기능 */
+				/* 채팅하기 */
 				else if(m[0].equals(chatTag)) {
 					chatt(m[1]);
 				}
@@ -252,8 +251,12 @@ class MessageListener extends Thread{
 			client.jf.nickname.setText("");
 			client.jf.id.setText("");
 			client.jf.pw.setText("");
-			client.jf.post.setText("");
+			client.jf.pwConfirm.setText("");
+			JoinFrame.post.setText("");
+			JoinFrame.road.setText("");
+			JoinFrame.detail.setText("");
 			client.jf.email.setText("");
+			client.jf.proImgL.setText("");
 		}
 	}
 	
@@ -295,7 +298,7 @@ class MessageListener extends Thread{
 			else {
 				System.out.println("[Client] 우편번호 검색 오류");
 				JOptionPane.showMessageDialog(null,"우편 번호가 검색되지 않았습니다","우편 번호 확인",JOptionPane.ERROR_MESSAGE);
-				client.jf.post.setText("");
+				JoinFrame.post.setText("");
 			}
 	}
 	
@@ -318,7 +321,6 @@ class MessageListener extends Thread{
 		if(!_m.equals("FAIL")) {	//전적 조회 성공
 			System.out.println("[Client] 전적 조회 성공");
 			String[] user = _m.split("@");
-			
 			client.rf.rank.setListData(user);
 		}
 	}
@@ -352,7 +354,6 @@ class MessageListener extends Thread{
 	void viewCUser(String _m) {
 		if(!_m.equals("")) {
 			String[] user = _m.split("@");
-			
 			client.mf.cuList.setListData(user);
 		}
 	}
@@ -361,7 +362,6 @@ class MessageListener extends Thread{
 	void roomList(String _m) {
 		if(!_m.equals("")) {
 			String[] room = _m.split("@");
-			
 			client.mf.rList.setListData(room);
 		}
 	}
@@ -418,7 +418,6 @@ class MessageListener extends Thread{
 			} else {					//흰 돌 태그면 2
 				client.gf.omok[n2][n1] = 2;
 			}
-			
 			client.gf.repaint();
 			client.gf.enable = true;	//돌을 놓을 수 있도록 함
 			client.gf.enableL.setText("본인 차례입니다.");
