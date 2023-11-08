@@ -102,6 +102,7 @@ class CCUser extends Thread{
 		try {
 			System.out.println("[Server] 클라이언트 접속 > " + this.socket.toString());
 			
+			FileInputStream _img = null;
 			os = this.socket.getOutputStream();
 			dos = new DataOutputStream(os);
 			is = this.socket.getInputStream();
@@ -139,12 +140,12 @@ class CCUser extends Thread{
 					}
 				}
 				
+				else if(m[0].equals(imgTag)) {
+					_img = db.imgCheck(m[1]);
+				}
+				
 				/* 회원가입 */
 				else if(m[0].equals(joinTag)) {
-					FileInputStream _img = null;
-					if(m[0].equals(imgTag)) {
-						_img = db.imgCheck(m[1]);
-					}
 					if(db.joinCheck(m[1], m[2], m[3], m[4], m[5], m[6], m[7], m[8], _img)) {	//회원가입 성공
 						dos.writeUTF(joinTag + "//OKAY");
 					}
