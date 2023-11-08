@@ -74,9 +74,15 @@ public class AddressSearchFrame extends JDialog {
 	               if(selectedIndex >= 0) {
 	                  String selectedAddress = list.getModel().getElementAt(selectedIndex);
 	                  
+	                  System.out.println(selectedAddress);
+	                  
+	                  
+	                  String postNo = selectedAddress.substring(6, 11);
+	                  String add = selectedAddress.substring(20);
+	                  
 	                  // 선택된 주소를 회원가입 창 주소에 설정
-	                  JoinFrame.setzipNoField(selectedAddress);
-	                  JoinFrame.setAddressField(selectedAddress);
+	                  JoinFrame.setzipNoField(postNo);
+	                  JoinFrame.setAddressField(add);
 	                  dispose();
 	               }
 	            }
