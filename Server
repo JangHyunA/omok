@@ -71,7 +71,6 @@ class CCUser extends Thread{
 	final String joinTag = "JOIN";		//회원가입
 	final String overTag = "OVER";		//중복확인
 	final String pwTag = "SAFE";		//비밀번호 유효성
-	final String postTag= "POST";
 	final String viewTag = "VIEW";		//회원정보조회
 	final String changeTag = "CHANGE";	//회원정보변경
 	final String rankTag = "RANK";		//전적조회(전체회원)
@@ -141,7 +140,7 @@ class CCUser extends Thread{
 				
 				/* 회원가입 */
 				else if(m[0].equals(joinTag)) {
-					if(db.joinCheck(m[1], m[2], m[3], m[4], m[5], m[6])) {	//회원가입 성공
+					if(db.joinCheck(m[1], m[2], m[3], m[4], m[5], m[6], m[7], m[8])) {	//회원가입 성공
 						dos.writeUTF(joinTag + "//OKAY");
 					}
 					
@@ -172,19 +171,6 @@ class CCUser extends Thread{
 	               }
 	            }
 				
-				/*
-	            else if(m[0].equals(postTag)){
-					String msg;
-					msg= PostZip.find(m[1], MIN_PRIORITY, MAX_PRIORITY, null, null);
-					System.out.println("우편번호 :"+msg);
-					if(msg.isEmpty()) {
-						dos.writeUTF(postTag + "//OKAY");						
-					}else {
-						dos.writeUTF(postTag + "//FAIL");
-					}
-					
-				}
-				/*
 				
 				/* 회원정보 조회 */
 				else if(m[0].equals(viewTag)) {
