@@ -6,12 +6,8 @@ import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLEncoder;
 import java.util.regex.Pattern;
 
-import javax.swing.AbstractButton;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
@@ -25,12 +21,6 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 
 public class JoinFrame extends JFrame{
 	   /* Panel */
@@ -119,34 +109,34 @@ public class JoinFrame extends JFrame{
          /* 비밀번호 강도 표시기 설정 */
          pwstL.setPreferredSize(new Dimension(100, 30));
          pwstIndicator.setPreferredSize(new Dimension(250, 30));
-           pwstIndicator.setStringPainted(true);
+         pwstIndicator.setStringPainted(true);
+          
+         /* 프로필 이미지 설정 */
+         proImgL.setPreferredSize(new Dimension(290, 300));
+         proImgL.setHorizontalAlignment(SwingConstants.CENTER); // 레이블 내용 가운데 정렬
            
-           /* 프로필 이미지 설정 */
-           proImgL.setPreferredSize(new Dimension(290, 300));
-           proImgL.setHorizontalAlignment(SwingConstants.CENTER); // 레이블 내용 가운데 정렬
-           
-           /* Panel 추가 작업 */
-          setContentPane(panel);   //panel을 기본 컨테이너로 설정
+         /* Panel 추가 작업 */
+         setContentPane(panel);   //panel을 기본 컨테이너로 설정
 
-          panel.add(nameL);
-          panel.add(name);
+         panel.add(nameL);
+         panel.add(name);
          
-          panel.add(nicknameL);
-          panel.add(nickname);
-          panel.add(nnolBtn);
+         panel.add(nicknameL);
+         panel.add(nickname);
+         panel.add(nnolBtn);
          
-          panel.add(idL);
-          panel.add(id);
-          panel.add(idolBtn);
+         panel.add(idL);
+         panel.add(id);
+         panel.add(idolBtn);
          
-          panel.add(pwL);
-          panel.add(pw);
-          panel.add(psolBtn);
-          panel.add(pwstL);
-          panel.add(pwstIndicator);
-          panel.add(pwConfirmL);
-          panel.add(pwConfirm);
-          panel.add(checkPwBtn);
+         panel.add(pwL);
+         panel.add(pw);
+         panel.add(psolBtn);
+         panel.add(pwstL);
+         panel.add(pwstIndicator);
+         panel.add(pwConfirmL);
+         panel.add(pwConfirm);
+         panel.add(checkPwBtn);
 
          panel.add(postL);
          panel.add(post);
@@ -254,8 +244,8 @@ public class JoinFrame extends JFrame{
         postBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-            	AddressSearchFrame adF = new AddressSearchFrame();
-                adF.setVisible(true);
+            	AddressSearchFrame asF = new AddressSearchFrame();
+                asF.setVisible(true);
             }
         });
 
@@ -313,19 +303,19 @@ public class JoinFrame extends JFrame{
           // - 적어도 하나의 특수 문자 포함
 
         if (password.length() >= 8) {
-            strength += 25;
+            strength += 20;
         }
         if (Pattern.compile("[A-Z]").matcher(password).find()) {
-            strength += 25;
+            strength += 20;
         }
         if (Pattern.compile("[a-z]").matcher(password).find()) {
-            strength += 25;
+            strength += 20;
         }
         if (Pattern.compile("\\d").matcher(password).find()) {
-            strength += 25;
+            strength += 20;
         }
         if (Pattern.compile("[!@#$%^&*]").matcher(password).find()) {
-            strength += 25;
+            strength += 20;
         }
         return Math.min(strength, 100); // 강도를 100으로 제한
     }
@@ -346,13 +336,15 @@ public class JoinFrame extends JFrame{
           }
           String upwcon = String.valueOf(pwConfirm.getPassword());
           String upost = post.getText();
+          String uroad = road.getText();
+          String udetail = detail.getText();
           String uemail = email.getText();
 
           /* 가입취소 버튼 이벤트 */
           if(b.getText().equals("가입취소")) {
              System.out.println("[Client] 회원가입 인터페이스 종료");
              
-             // 모든 입력 필드 리셋
+               // 모든 입력 필드 리셋
                name.setText("");
                nickname.setText("");
                id.setText("");
@@ -369,15 +361,15 @@ public class JoinFrame extends JFrame{
           
           /* 가입하기 버튼 이벤트 */
           else if(b.getText().equals("가입하기")) {
-             if(uname.equals("") || unick.equals("") || uid.equals("") || upass.equals("") || upwcon.equals("") ||upost.equals("") || uemail.equals("")) {
+             if(uname.equals("") || unick.equals("") || uid.equals("") || upass.equals("") || upwcon.equals("") || upost.equals("") || uroad.equals("") ||udetail.equals("") ||uemail.equals("")) {
                 //모든 정보가 입력되지 않으면 회원가입 시도 실패
                 JOptionPane.showMessageDialog(null, "모든 정보를 기입해주세요", "회원가입 실패", JOptionPane.ERROR_MESSAGE);
                 System.out.println("[Client] 회원가입 실패 : 회원정보 미입력");
              }
              
-             else if(!uname.equals("") && !unick.equals("") && !uid.equals("") && !upass.equals("") && !upwcon.equals("") && !upost.equals("") && !uemail.equals("")) {
+             else if(!uname.equals("") && !unick.equals("") && !uid.equals("") && !upass.equals("") && !upwcon.equals("") && !upost.equals("") && !uroad.equals("") && !udetail.equals("") && !uemail.equals("")) {
                 //회원가입 시도 성공
-                c.sendMsg(joinTag + "//" + uname + "//" + unick + "//" + uid + "//" + upass + "//" + upost + "//" + uemail);   //서버에 회원가입 정보 전송
+                c.sendMsg(joinTag + "//" + uname + "//" + unick + "//" + uid + "//" + upass + "//" + upost + "//" + uroad + "//" + udetail + "//" + uemail);   //서버에 회원가입 정보 전송
              }
           }
        }
