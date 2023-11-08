@@ -73,6 +73,7 @@ public class Database {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		System.out.println(fis);
 		return fis;
 	}
 	
@@ -93,8 +94,21 @@ public class Database {
 		
 		try {
 			//member 테이블에 각 문자열들을 순서대로 업데이트하는 문장. 승, 패는 초기값을 숫자 0으로 한다.
-			String insertStr = "INSERT INTO member VALUES('" + na + "', '" + nn + "', '" + id + "', '" + pw + "', '" + po + "', '" + ro + "', '" + de + "', '" + em + "', '" + _img + "', 0, 0)";
-			stmt.executeUpdate(insertStr);
+			
+			PreparedStatement pre = con.prepareStatement("INSERT INTO member(name, nickname, id, password, post, road, detail, email, img, win, lose) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)");
+			pre.setString(1, na);
+			pre.setString(2, nn);
+			pre.setString(3, id);
+			pre.setString(4, pw);
+			pre.setString(5, po);
+			pre.setString(6, ro);
+			pre.setString(7, de);
+			pre.setString(8, em);
+			pre.setBinaryStream(9, _img);
+			pre.setInt(10, 0);
+			pre.setInt(11, 0);
+			pre.executeUpdate();
+			pre.close();
 			
 			flag = true;	//업데이트문이 정상적으로 수행되면 flag를 true로 초기화하고 성공을 콘솔로 알린다.
 			System.out.println("[Server] 회원가입 성공");
