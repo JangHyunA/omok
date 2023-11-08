@@ -256,7 +256,7 @@ class MessageListener extends Thread{
 			JoinFrame.road.setText("");
 			JoinFrame.detail.setText("");
 			client.jf.email.setText("");
-			client.jf.proImgL.setText("");
+			client.jf.proImgL.setIcon(null);		
 		}
 	}
 	
