@@ -21,6 +21,7 @@ public class Client {
 	CInfoFrame cinf = null;
 	GameFrame gf = null;
 	SRankFrame srf = null;
+	AdminFrame af = null;
 	
 	public static void main(String[] args) {
 		Client client = new Client();
@@ -42,6 +43,7 @@ public class Client {
 			client.cinf = new CInfoFrame(client);
 			client.gf = new GameFrame(client);
 			client.srf = new SRankFrame(client);
+			client.af = new AdminFrame(client);
 			
 			MessageListener msgListener = new MessageListener(client, client.mySocket);
 			msgListener.start();	//스레드 시작
@@ -313,6 +315,17 @@ class MessageListener extends Thread{
 		
 		else {					//회원정보 조회 실패
 			System.out.println("[Client] 회원 정보 조회 실패");
+		}
+	}
+	
+	/* 일반사용자/관리자를 확인하는 메소드 */
+	void viewMyRole(String m) {
+		if(!m.equals("FAIL")) {	// 조회 성공
+			System.out.println("[Client] 관리자 조회 성공");
+			client.af.setVisible(true);
+		}
+		else {					// 조회 실패
+			System.out.println("[Client] 관리자 조회 실패");
 		}
 	}
 	
