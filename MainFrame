@@ -26,8 +26,10 @@ public class MainFrame extends JFrame{
 	/* Menu */
 	JMenuBar mb = new JMenuBar();
 	JMenu infoMenu = new JMenu("내정보");
+	JMenu AdminMenu = new JMenu("관리자");
 	JMenuItem viewInfo = new JMenuItem("내 정보 보기");
 	JMenuItem changeInfo = new JMenuItem("내 정보 바꾸기");
+	JMenuItem viewRole = new JMenuItem("관리자 모드");
 	
 	/* Button */
 	JButton viewRanking = new JButton("전적 보기");
@@ -55,6 +57,10 @@ public class MainFrame extends JFrame{
 		infoMenu.addSeparator();
 		infoMenu.add(changeInfo);
 		mb.add(infoMenu);
+		
+		AdminMenu.add(viewRole);
+		mb.add(AdminMenu);
+
 		setJMenuBar(mb);
 		
 		/* Panel 크기 작업 */
@@ -102,6 +108,7 @@ public class MainFrame extends JFrame{
 		
 		viewInfo.addActionListener(mil);
 		changeInfo.addActionListener(mil);
+		viewRole.addActionListener(mil);
 		
 		/* Button 이벤트 리스너 추가 */
 		ButtonListener bl = new ButtonListener();
@@ -194,6 +201,15 @@ public class MainFrame extends JFrame{
 				c.cinf.setVisible(true);
 				System.out.println("[Client] 회원 정보 변경 인터페이스 열림");
 			}
+			
+			/* 관리자 모드 메뉴 이벤트 */
+	        else if (mi.getText().equals("관리자 모드")) {
+	                c.af.setVisible(true);
+	                System.out.println("[Client] 관리자 모드 인터페이스 열림");
+	            } else {
+	                JOptionPane.showMessageDialog(null, "관리자 권한이 없습니다.", "접근 실패", JOptionPane.ERROR_MESSAGE);
+	                System.out.println("[Client] 관리자 모드 오류: 권한이 없음");
+	            }
+	        }
 		}
 	}
-}
