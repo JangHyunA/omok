@@ -90,12 +90,12 @@ public class Database {
 		String po = _o;
 		String ro = _r;
 		String de = _d;
-		String em = _e; 
+		String em = _e;
 		
 		try {
 			//member 테이블에 각 문자열들을 순서대로 업데이트하는 문장. 승, 패는 초기값을 숫자 0으로 한다.
 			
-			PreparedStatement pre = con.prepareStatement("INSERT INTO member(name, nickname, id, password, post, road, detail, email, img, win, lose) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)");
+			PreparedStatement pre = con.prepareStatement("INSERT INTO member(name, nickname, id, password, post, road, detail, email, img, role, win, lose) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 			pre.setString(1, na);
 			pre.setString(2, nn);
 			pre.setString(3, id);
@@ -105,8 +105,9 @@ public class Database {
 			pre.setString(7, de);
 			pre.setString(8, em);
 			pre.setBinaryStream(9, _img);
-			pre.setInt(10, 0);
+			pre.setString(10, "USER");
 			pre.setInt(11, 0);
+			pre.setInt(12, 0);
 			pre.executeUpdate();
 			pre.close();
 			
@@ -153,7 +154,7 @@ public class Database {
        return flag;   //flag 반환
     }
 	
- // 비밀번호의 유효성 검사를 확인해주는 메소드
+    // 비밀번호의 유효성 검사를 확인해주는 메소드
     boolean passwordCheck(String pass) {
        boolean flag = false;  // 비밀번호 안전 확인 
        String valid = "^(?=.*[a-z])(?=.*[A-Z])(?=.*[!?@#$^*+=-]).{8,}$";
@@ -221,6 +222,16 @@ public class Database {
 		
 		return flag;	//flag 반환
 	}
+	
+	
+	/* 일반 사용자/관리자를 구분하는 메소드
+	void viewRole() {
+		try {
+			String selcectStr = "SELECT role FROM member WHERE id='" + role + "'";
+		}
+	} */
+	
+	
 	
 	//전체 회원의 전적을 조회하는 메소드. 모든 회원의 전적을 String 형태로 반환한다.
 	String viewRank() {
