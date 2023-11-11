@@ -1,0 +1,30 @@
+package omok;
+
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+
+public class AdminFrame extends JFrame{
+	/* Panel */
+	JPanel panel = new JPanel();
+	
+	/* Button */
+	// 버튼 넣기
+	
+	Client c = null;
+
+	public Object role;
+	
+	// 태그 넣기
+	
+	AdminFrame(Client _c) {
+		c = _c;
+		
+		setTitle("관리자 모드");
+		
+				
+		setSize(510, 450);
+		setLocationRelativeTo(null);
+		setResizable(false);
+	}
+}
