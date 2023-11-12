@@ -223,15 +223,35 @@ public class Database {
 		return flag;	//flag 반환
 	}
 	
+	/*
+	 * 관리자 접근은 
+	 * admin_code 로 관리자 권한이 주어진 사람에게 부여되는 코드로 입장이 가능합니다. 
+	 * 따라서, ADMIN 권한이 있어도, 각 관리자에게 주어진 코드 번호가 없으면 입장이 불가능합니다.
+	 * 또한, 코드번호를 알아도, ADMIN 권한이 존재하지 않는다면 권한이 불가능합니다. 
+	 * 
+	 * 관리자 모드 접근 성공시, 안내 문구로 관리자의 이름이 함께 노출 됩니다. 
+	 */	
 	
-	/* 일반 사용자/관리자를 구분하는 메소드
-	void viewRole() {
+	/* 일반 사용자/관리자를 구분하는 메소드 */
+	String adminCheck(String _n, String code) {
+		String nick = _n; 
+		String name = "null";
+
 		try {
-			String selcectStr = "SELECT role FROM member WHERE id='" + role + "'";
+				String selectStr = "SELECT name FROM member WHERE admin_code='" + code + "' and nickname ='" + nick + "' and role = 'ADMIN'";
+				ResultSet result = stmt.executeQuery(selectStr);
+				
+				while(result.next()) {
+						name = result.getString("name");
+				} 
+					System.out.println("[Server] 관리자 조회 성공");
+			
+		}catch(Exception e) {
+			System.out.println("[Server] 조회 실패 > "+ e.toString());
+			
 		}
-	} */
-	
-	
+		return name;
+	}
 	
 	//전체 회원의 전적을 조회하는 메소드. 모든 회원의 전적을 String 형태로 반환한다.
 	String viewRank() {
