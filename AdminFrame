@@ -1,17 +1,56 @@
 package omok;
 
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+
+import omok.MainFrame.ButtonListener;
 
 public class AdminFrame extends JFrame{
 	/* Panel */
-	JPanel panel = new JPanel();
+	JPanel basePanel = new JPanel(new BorderLayout());
+	JPanel centerPanel = new JPanel();
+	JPanel eastPanel = new JPanel();
+	
+	/* Label */
+	JLabel roomListL = new JLabel("================ 방 목록 ================");
+	JLabel cuListL = new JLabel("======= 접속 인원 =======");
+	
+	/* ScrollPane */
+	JScrollPane rL_sp;
+	JScrollPane cL_sp;
+	
+	/* List */
+	JList<String> rList = new JList<String>();
+	JList<String> cuList = new JList<String>();
 	
 	/* Button */
-	// 버튼 넣기
+	JButton resetPw = new JButton("비밀번호 초기화");
+	JButton exitRoom = new JButton("강제 퇴장하기");
+	JButton endRoom = new JButton("강제 종료하기");
+	JButton outGame = new JButton("강제 탈퇴하기");
+	
+	String selRoom;		//선택된 방 제목
+	String roomName;	//생성할 방 제목
 	
 	Client c = null;
+	
+	final String resetpwTag = "RESET";	//비밀번호 초기화
+	final String exitroomTag = "EXIT";	//강제 퇴장하기
+	final String endroomTag = "END";	//강제 종료하기
+	final String outgameTag = "OUT";	//강제 탈퇴하기
 
 	public Object role;
 	
@@ -22,9 +61,117 @@ public class AdminFrame extends JFrame{
 		
 		setTitle("관리자 모드");
 		
+		
+		/* Panel 크기 작업 */
+		centerPanel.setPreferredSize(new Dimension(310, basePanel.getHeight()));
+		eastPanel.setPreferredSize(new Dimension(180, basePanel.getHeight()));
+		
+		/* Label 크기 작업 */
+		roomListL.setPreferredSize(new Dimension(290, 20));
+		cuListL.setPreferredSize(new Dimension(160, 20));
+		
+		/* ScrollPane 크기 작업 */
+		rL_sp = new JScrollPane(rList);
+		cL_sp = new JScrollPane(cuList);
+		rL_sp.setPreferredSize(new Dimension(300, 370));
+		cL_sp.setPreferredSize(new Dimension(160, 208));
+		
+		/* Button 크기 작업 */
+		resetPw.setPreferredSize(new Dimension(160, 35));
+		exitRoom.setPreferredSize(new Dimension(160, 35));
+		endRoom.setPreferredSize(new Dimension(160, 35));
+		outGame.setPreferredSize(new Dimension(160, 35));
+		
+		/* Panel 추가 작업 */
+		setContentPane(basePanel);	//panel을 기본 컨테이너로 설정
+		
+		basePanel.add(centerPanel, BorderLayout.CENTER);
+		basePanel.add(eastPanel, BorderLayout.EAST);
+		
+		centerPanel.setLayout(new FlowLayout());
+		eastPanel.setLayout(new FlowLayout());
+		
+		centerPanel.add(roomListL);
+		centerPanel.add(rL_sp);
+		
+		/* eastPanel 컴포넌트 */
+		eastPanel.add(cuListL);
+		eastPanel.add(cL_sp);
+		eastPanel.add(resetPw);
+		eastPanel.add(exitRoom);
+		eastPanel.add(endRoom);
+		eastPanel.add(outGame);
+		
+		/* Button 이벤트 리스너 추가 */
+		ButtonListener bl = new ButtonListener();
+		
+		resetPw.addActionListener(bl);
+		exitRoom.addActionListener(bl);
+		endRoom.addActionListener(bl);
+		outGame.addActionListener(bl);
+		
+		/* Mouse 이벤트 추가 */
+		rList.addMouseListener(new MouseListener() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if(!rList.isSelectionEmpty()) {
+					String[] m = rList.getSelectedValue().split(" : ");
+					selRoom = m[0];
+				}
+			}
+			public void mousePressed(MouseEvent e) { }
+			public void mouseReleased(MouseEvent e) { }
+			public void mouseEntered(MouseEvent e) { }
+			public void mouseExited(MouseEvent e) { }
+		});
 				
 		setSize(510, 450);
 		setLocationRelativeTo(null);
 		setResizable(false);
+	}
+	
+	/* Button 이벤트 리스너 */
+	class ButtonListener implements ActionListener{
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			JButton b = (JButton)e.getSource();
+			
+			/* 비밀번호 초기화 버튼 이벤트
+			if(b.getText().equals("비밀번호 초기화")) {
+				c.rf.setVisible(true);
+				System.out.println("[Client] 전적 조회 인터페이스 열림");
+				c.sendMsg(resetpwTag + "//");	//서버에 전적 조회 태그 전송
+			}
+			
+			/* 강제 퇴장하기 버튼 이벤트 
+			else if(b.getText().equals("강제 퇴장하기")) {
+				//생성할 방 제목을 입력받음
+				roomName = JOptionPane.showInputDialog(null, "생성할 방 제목을 입력하시오", "방 생성", JOptionPane.QUESTION_MESSAGE);
+				
+				if(roomName != null) {	//roomName이 null이 아니면 서버에 "태그//방이름" 형태의 메시지를 전송
+					c.sendMsg(exitroomTag + "//" + roomName);
+				} else {				//roomName이 null이면 방 생성 시도 실패
+					JOptionPane.showMessageDialog(null, "방 제목이 입력되지 않았습니다", "생성 실패", JOptionPane.ERROR_MESSAGE);
+					System.out.println("[Client] 방 생성 오류 : 입력 값이 존재하지 않음");
+				}
+			}
+			
+			/* 강제 종료하기 버튼 이벤트 
+			else if(b.getText().equals("강제 종료하기")) {
+				if(selRoom != null) {	//selRoom이 null이 아니면 서버에 "태그//방이름" 형태의 메시지를 전송
+					c.sendMsg(endroomTag + "//" + selRoom);
+				} else {				//selRoom이 null이면 입장 시도 실패
+					JOptionPane.showMessageDialog(null, "입장할 방을 선택해주세요", "입장 실패", JOptionPane.ERROR_MESSAGE);
+					System.out.println("[Client] 방 입장 오류 : 선택 값이 존재하지 않음");
+				}
+			}
+			
+			/* 강제 탈퇴하기 버튼 이벤트 
+			else if(b.getText().equals("강제 탈퇴하기")) {
+				System.out.println("[Client] 게임 종료");
+				c.sendMsg(outgameTag + "//");		//서버에 프로그램 종료 태그 전송
+				System.exit(0);					//프로그램 강제 종료
+			} */
+		}
 	}
 }
