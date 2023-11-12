@@ -82,8 +82,10 @@ class MessageListener extends Thread{
 	final String overTag = "OVER";		//중복확인
 	final String pwTag = "SAFE";		//비밀번호 유효성
 	final String postTag = "POST";		//우편번호
+	final String imgTag = "IMAGE";		//프로필이미지
 	final String viewTag = "VIEW";		//회원정보조회
 	final String changeTag = "CHANGE";	//회원정보변경
+	final String adminTag = "ADMIN"; 	//관리자 접근
 	final String rankTag = "RANK";		//전적조회(전체회원)
 	final String croomTag = "CROOM";	//방생성
 	final String vroomTag = "VROOM";	//방목록
@@ -92,11 +94,16 @@ class MessageListener extends Thread{
 	final String cuserTag = "CUSER";	//접속유저
 	final String chatTag = "CHAT";		//채팅하기
 	final String searchTag = "SEARCH";	//전적조회(한명)
+	final String resetpwTag = "RESET";	//비밀번호 초기화
+	final String exitroomTag = "EXIT";	//강제 퇴장하기
+	final String endroomTag = "END";	//강제 종료하기
+	final String outgameTag = "OUT";	//강제 탈퇴하기
 	final String omokTag = "OMOK";		//오목
 	final String blackTag = "BLACK";	//검은색 돌
 	final String whiteTag = "WHITE";	//흰색 돌
 	final String winTag = "WIN";		//승리
 	final String loseTag = "LOSE";		//패배
+	final String pexitTag = "PEXIT";	//프로그램종료
 	final String rexitTag = "REXIT";	//방퇴장
 	final String recordTag = "RECORD";	//전적업데이트
 	
@@ -157,6 +164,11 @@ class MessageListener extends Thread{
 					changeInfo(m[1]);
 				}
 				
+				/* 관리자 접근 확인 */
+				else if(m[0].equals(adminTag)) {
+					adminCheck(m[1]);
+				}
+				
 				/* 방 생성 */
 				else if(m[0].equals(croomTag)) {
 					createRoom(m[1]);
@@ -165,16 +177,19 @@ class MessageListener extends Thread{
 				/* 접속 유저 */
 				else if(m[0].equals(cuserTag)) {
 					viewCUser(m[1]);
+					adviewCUser(m[1]);
 				}
 				
 				/* 방 목록 */
-				else if(m[0].equals(vroomTag)) {
-					if(m.length > 1) {	//배열크기가 1보다 클 때
-						roomList(m[1]);
-					} else {	//배열크기가 1보다 작다 == 방이 없다
-						String[] room = {""};	//방 목록이 비도록 함
-						client.mf.rList.setListData(room);
-					}
+				else if (m[0].equals(vroomTag)) {
+				    if (m.length > 1) { // 배열크기가 1보다 클 때
+				        roomList(m[1]);
+				        adroomList(m[1]);
+				    } else { // 배열크기가 1보다 작다 == 방이 없다
+				        String[] room = {""}; // 방 목록이 비도록 함
+				        client.mf.rList.setListData(room);
+				        client.af.rList.setListData(room);
+				    }
 				}
 				
 				/* 방 입장 */
@@ -291,6 +306,7 @@ class MessageListener extends Thread{
 	    }
 	 }
 	 
+	 /* 우편번호를 검색하는 메소드 */
 	 void postCheck(String _m) {
 			if(_m.equals("OKAY")){
 				System.out.println("[Client] 우편번호 검색 완료");
@@ -318,14 +334,16 @@ class MessageListener extends Thread{
 		}
 	}
 	
-	/* 일반사용자/관리자를 확인하는 메소드 */
-	void viewMyRole(String m) {
-		if(!m.equals("FAIL")) {	// 조회 성공
-			System.out.println("[Client] 관리자 조회 성공");
+	/* 관리자 접근 메소드 */
+	void adminCheck(String m) {
+		if(!m.equals("FAIL")) {	// 관리자 접근 성공
+			System.out.println("[Client_Admin] 관리자 접근 성공");
+			JOptionPane.showMessageDialog(null, m+ "님 \n 관리자 모드로 들어갑니다","관리자 모드", JOptionPane.INFORMATION_MESSAGE);
 			client.af.setVisible(true);
 		}
-		else {					// 조회 실패
-			System.out.println("[Client] 관리자 조회 실패");
+		else {					// 접근 실패 
+			System.out.println("[Client_Admin] 관리자 조회 실패");
+			JOptionPane.showMessageDialog(null,"관리자 모드 접근이 거부되었습니다.","관리자 모드",JOptionPane.ERROR_MESSAGE);
 		}
 	}
 	
@@ -371,11 +389,27 @@ class MessageListener extends Thread{
 		}
 	}
 	
+	/* 관리자모드 접속 인원을 출력하는 메소드 */
+	void adviewCUser(String _m) {
+		if(!_m.equals("")) {
+			String[] user = _m.split("@");
+			client.af.cuList.setListData(user);
+		}
+	}
+	
 	/* 방 목록을 출력하는 메소드 */
 	void roomList(String _m) {
 		if(!_m.equals("")) {
 			String[] room = _m.split("@");
 			client.mf.rList.setListData(room);
+		}
+	}
+	
+	/* 관리자모드 방 목록을 출력하는 메소드 */
+	void adroomList(String _m) {
+		if(!_m.equals("")) {
+			String[] room = _m.split("@");
+			client.af.rList.setListData(room);
 		}
 	}
 	
