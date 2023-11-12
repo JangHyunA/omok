@@ -46,6 +46,7 @@ public class MainFrame extends JFrame{
 	final String eroomTag = "EROOM";	//방 입장 기능 태그
 	final String rankTag = "RANK";		//전적 조회 기능 태그
 	final String pexitTag = "PEXIT";	//프로그램 종료 기능 태그
+	final String adminTag = "ADMIN";    //관리자 모드 기능 태그
 
 	MainFrame(Client _c) {
 		c = _c;
@@ -204,12 +205,14 @@ public class MainFrame extends JFrame{
 			
 			/* 관리자 모드 메뉴 이벤트 */
 	        else if (mi.getText().equals("관리자 모드")) {
-	                c.af.setVisible(true);
-	                System.out.println("[Client] 관리자 모드 인터페이스 열림");
-	            } else {
-	                JOptionPane.showMessageDialog(null, "관리자 권한이 없습니다.", "접근 실패", JOptionPane.ERROR_MESSAGE);
-	                System.out.println("[Client] 관리자 모드 오류: 권한이 없음");
+	        		// Role 이 관리자인 사람만 접근 허용 조건 검색
+	        	JOptionPane.showMessageDialog(null, "관리자만 입장 가능합니다.", "접근 확인 ", JOptionPane.INFORMATION_MESSAGE);
+	            String code = JOptionPane.showInputDialog(null,"관리자 접근 코드를 입력해주세요","접근 확인 입력 코드", JOptionPane.WARNING_MESSAGE);
+	            
+	            if( code !=null) {
+	            	c.sendMsg(adminTag + "//"+ code);
 	            }
 	        }
 		}
 	}
+}
