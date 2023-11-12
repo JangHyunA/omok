@@ -71,22 +71,30 @@ class CCUser extends Thread{
 	final String joinTag = "JOIN";		//회원가입
 	final String overTag = "OVER";		//중복확인
 	final String pwTag = "SAFE";		//비밀번호 유효성
-	final String imgTag = "IMAGE";
+	final String postTag = "POST";		//우편번호
+	final String imgTag = "IMAGE";		//프로필이미지
 	final String viewTag = "VIEW";		//회원정보조회
 	final String changeTag = "CHANGE";	//회원정보변경
+	final String adminTag = "ADMIN";  	//관리자 모드 접근
 	final String rankTag = "RANK";		//전적조회(전체회원)
 	final String croomTag = "CROOM";	//방생성
 	final String vroomTag = "VROOM";	//방목록
 	final String uroomTag = "UROOM";	//방유저
 	final String eroomTag = "EROOM";	//방입장
 	final String cuserTag = "CUSER";	//접속유저
+	final String chatTag = "CHAT";		//채팅하기
 	final String searchTag = "SEARCH";	//전적조회(한명)
-	final String chatTag = "CHAT";
-	final String pexitTag = "PEXIT";	//프로그램종료
-	final String rexitTag = "REXIT";	//방퇴장
+	final String resetpwTag = "RESET";	//비밀번호 초기화
+	final String exitroomTag = "EXIT";	//강제 퇴장하기
+	final String endroomTag = "END";	//강제 종료하기
+	final String outgameTag = "OUT";	//강제 탈퇴하기
 	final String omokTag = "OMOK";		//오목
+	final String blackTag = "BLACK";	//검은색 돌
+	final String whiteTag = "WHITE";	//흰색 돌
 	final String winTag = "WIN";		//승리
 	final String loseTag = "LOSE";		//패배
+	final String pexitTag = "PEXIT";	//프로그램종료
+	final String rexitTag = "REXIT";	//방퇴장
 	final String recordTag = "RECORD";	//전적업데이트
 	
 	CCUser(Socket _s, Server _ss) {
@@ -140,6 +148,7 @@ class CCUser extends Thread{
 					}
 				}
 				
+				/* 이미지 파일 변환  */
 				else if(m[0].equals(imgTag)) {
 					_img = db.imgCheck(m[1]);
 				}
@@ -197,6 +206,16 @@ class CCUser extends Thread{
 					
 					else {	//변경 실패
 						dos.writeUTF(changeTag + "//FAIL");
+					}
+				}
+				
+				/* 관리자 모드 접근 */
+				else if(m[0].equals(adminTag)) {
+					if(!db.adminCheck(nickname, m[1]).equals("null")) {
+						dos.writeUTF(adminTag+"//"+ db.adminCheck(nickname, m[1]));
+					}
+					else {
+						dos.writeUTF(adminTag+ "//FAIL");
 					}
 				}
 				
