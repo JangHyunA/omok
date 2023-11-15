@@ -164,6 +164,11 @@ class MessageListener extends Thread{
 					changeInfo(m[1]);
 				}
 				
+				/* 비밀번호 초기화 */
+				else if(m[0].equals(resetpwTag)) {
+					resetPw(m[1]);
+				}
+				
 				/* 관리자 접근 확인 */
 				else if(m[0].equals(adminTag)) {
 					adminCheck(m[1]);
@@ -369,6 +374,19 @@ class MessageListener extends Thread{
 		}
 	}
 	
+	/* 비밀번호 초기화하는 메소드 */
+	void resetPw(String _m) {
+		if(_m.equals("OKAY")) {	//비밀번호 초기화 성공
+			System.out.println("[Client-Admin] 변경 성공");
+			JOptionPane.showMessageDialog(null, "정상적으로 변경되었습니다", "회원정보변경", JOptionPane.INFORMATION_MESSAGE);
+		}
+		
+		else {				//비밀번호 초기화 실패
+			System.out.println("[Client-Admin] 이름 변경 실패");
+			JOptionPane.showMessageDialog(null, "변경에 실패하였습니다", "회원정보변경", JOptionPane.ERROR_MESSAGE);
+		}
+	}
+	
 	/* 방 생성 여부를 확인하는 메소드 */
 	void createRoom(String _m) {
 		if(_m.equals("OKAY")) {	//방 생성 성공
@@ -434,7 +452,6 @@ class MessageListener extends Thread{
 	void roomUser(String _m) {
 		if(!_m.equals("")) {
 			String[] user = _m.split("@");
-			
 			client.gf.userList.setListData(user);
 		}
 	}
