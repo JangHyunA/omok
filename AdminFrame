@@ -44,6 +44,7 @@ public class AdminFrame extends JFrame{
 	
 	String selRoom;		//선택된 방 제목
 	String roomName;	//생성할 방 제목
+	String pw;
 	
 	Client c = null;
 	
@@ -136,11 +137,10 @@ public class AdminFrame extends JFrame{
 		public void actionPerformed(ActionEvent e) {
 			JButton b = (JButton)e.getSource();
 			
-			/* 비밀번호 초기화 버튼 이벤트 - 안 건들임..
-			if(b.getText().equals("비밀번호 초기화")) {
-				c.rf.setVisible(true);
-				System.out.println("[Client] 전적 조회 인터페이스 열림");
-				c.sendMsg(resetpwTag + "//");	//서버에 전적 조회 태그 전송
+			/* 비밀번호 초기화 버튼 이벤트 */
+			if(b.getText().equals("비밀번호 변경하기")) {
+				System.out.println("[Client_admin] 비밀번호 초기화");
+				c.sendMsg(resetpwTag + "//password//" + pw);
 			}
 			
 			/* 강제 퇴장하기 버튼 이벤트 - 안 건들임..
