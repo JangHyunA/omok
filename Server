@@ -209,6 +209,7 @@ class CCUser extends Thread{
 					}
 				}
 				
+				
 				/* 관리자 모드 접근 */
 				else if(m[0].equals(adminTag)) {
 					if(!db.adminCheck(nickname, m[1]).equals("null")) {
@@ -216,6 +217,17 @@ class CCUser extends Thread{
 					}
 					else {
 						dos.writeUTF(adminTag+ "//FAIL");
+					}
+				}
+				
+				/* 비밀번호 초기화 - 관리자 권한 */
+				else if(m[0].equals(resetpwTag)) {
+					if(db.resetPw(nickname, m[1])) {	//변경 성공
+						dos.writeUTF(resetpwTag + "//OKAY");
+					}
+					
+					else {	//변경 실패
+						dos.writeUTF(resetpwTag + "//FAIL");
 					}
 				}
 				
@@ -343,6 +355,26 @@ class CCUser extends Thread{
 					sendWait(roomInfo());		//대기실 접속 인원에 방 목록을 전송
 					sendWait(connectedUser());	//대기실 접속 인원에 전체 접속 인원을 전송
 				}
+				
+				/* 관리자 권한으로 방 강제 종료
+				else if(m[0].equals(endroomTag)) {
+					myRoom.ccu.remove(this);	//myRoom의 접속 인원에서 클라이언트 삭제
+					myRoom.count--;				//myRoom의 인원수 하나 삭제
+					wuser.add(this);			//대기실 접속 인원에 클라이언트 추가
+					
+					System.out.println("[Server] " + nickname + " : 방 '" + myRoom.title + "' 퇴장");
+					
+					if(myRoom.count==0) {	//myRoom의 인원수가 0이면 myRoom을 room 배열에서 삭제
+						room.remove(myRoom);
+					}
+					
+					if(room.size() != 0) {	//생성된 room의 개수가 0이 아니면 방에 입장한 인원에 방 인원 목록을 전송
+						sendRoom(roomUser());
+					}
+					
+					sendWait(roomInfo());		//대기실 접속 인원에 방 목록을 전송
+					sendWait(connectedUser());	//대기실 접속 인원에 전체 접속 인원을 전송
+				} */
 				
 				/* 오목 */
 				else if(m[0].equals(omokTag)) {
