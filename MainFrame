@@ -27,7 +27,7 @@ public class MainFrame extends JFrame{
 	JMenuBar mb = new JMenuBar();
 	JMenu infoMenu = new JMenu("내정보");
 	JMenu AdminMenu = new JMenu("관리자");
-	JMenuItem viewInfo = new JMenuItem("내 정보 보기");
+	JMenuItem	viewInfo = new JMenuItem("내 정보 보기");
 	JMenuItem changeInfo = new JMenuItem("내 정보 바꾸기");
 	JMenuItem viewRole = new JMenuItem("관리자 모드");
 	
@@ -42,11 +42,12 @@ public class MainFrame extends JFrame{
 	
 	Client c = null;
 	
+	final String juserTag = "JUSER"; // 가입된 회원 조회 태그
 	final String croomTag = "CROOM";	//방 생성 기능 태그
 	final String eroomTag = "EROOM";	//방 입장 기능 태그
 	final String rankTag = "RANK";		//전적 조회 기능 태그
 	final String pexitTag = "PEXIT";	//프로그램 종료 기능 태그
-	final String adminTag = "ADMIN";    //관리자 모드 기능 태그
+	final String adminTag = "ADMIN"; // 관리자 모드 기능 태그
 
 	MainFrame(Client _c) {
 		c = _c;
@@ -120,7 +121,7 @@ public class MainFrame extends JFrame{
 		exitGame.addActionListener(bl);
 		
 		/* Mouse 이벤트 추가 */
-		rList.addMouseListener(new MouseListener() {
+		rList.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				if(!rList.isSelectionEmpty()) {
@@ -128,11 +129,8 @@ public class MainFrame extends JFrame{
 					selRoom = m[0];
 				}
 			}
-			public void mousePressed(MouseEvent e) { }
-			public void mouseReleased(MouseEvent e) { }
-			public void mouseEntered(MouseEvent e) { }
-			public void mouseExited(MouseEvent e) { }
 		});
+		
 		
 		setSize(510, 450);
 		setLocationRelativeTo(null);
@@ -207,10 +205,11 @@ public class MainFrame extends JFrame{
 	        else if (mi.getText().equals("관리자 모드")) {
 	        		// Role 이 관리자인 사람만 접근 허용 조건 검색
 	        	JOptionPane.showMessageDialog(null, "관리자만 입장 가능합니다.", "접근 확인 ", JOptionPane.INFORMATION_MESSAGE);
-	            String code = JOptionPane.showInputDialog(null,"관리자 접근 코드를 입력해주세요","접근 확인 입력 코드", JOptionPane.WARNING_MESSAGE);
+	            String code = JOptionPane.showInputDialog(null,"관리자 접근 코드를 입력해주세요","관리자 접근 확인", JOptionPane.WARNING_MESSAGE);
 	            
 	            if( code !=null) {
 	            	c.sendMsg(adminTag + "//"+ code);
+	            	c.sendMsg(juserTag + "//");
 	            }
 	        }
 		}
