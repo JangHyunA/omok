@@ -8,6 +8,8 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.regex.Pattern;
 
+import javax.swing.JComboBox;
+import javax.swing.ButtonGroup;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -18,8 +20,12 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JProgressBar;
+import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
+import javax.swing.border.Border;
+import javax.swing.border.LineBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
@@ -34,11 +40,15 @@ public class JoinFrame extends JFrame{
 	   JLabel pwL = new JLabel("비밀번호");
 	   JLabel pwstL = new JLabel("비밀번호 강도");
 	   JLabel pwConfirmL = new JLabel("비밀번호 확인");
+	   JLabel genderL = new JLabel("성별");
+	   JLabel birthL = new JLabel(" 생년월일");
+	   JLabel phoneL = new JLabel("전화번호");
+	   JLabel emailL = new JLabel("이메일");
 	   JLabel postL = new JLabel("우편번호");
        JLabel roadL = new JLabel("도로명주소");
        JLabel detailL = new JLabel("상세주소");
-       JLabel emailL = new JLabel("이메일");
        JLabel proImgL = new JLabel("프로필 이미지 넣는 곳");
+       
        
        /* TextField */
        JTextField name = new JTextField();
@@ -46,10 +56,22 @@ public class JoinFrame extends JFrame{
        JTextField id = new JTextField();
        JPasswordField pw = new JPasswordField();
        JPasswordField pwConfirm = new JPasswordField();
+       JTextField phone1 = new JTextField();
+       JTextField phone2 = new JTextField();
+       JTextField email = new JTextField();
        static JTextField post = new JTextField();
        static JTextField road = new JTextField();
        static JTextField detail = new JTextField();
-       JTextField email = new JTextField();
+       
+       /* ComboBox */
+       JComboBox<String> yearCombo = new JComboBox<String>();
+       JComboBox<String> monthCombo = new JComboBox<String>();
+       JComboBox<String> dayCombo = new JComboBox<String>();
+	   JComboBox<String> phoneCombo = new JComboBox<>(new String[]{"010", "011", "02", "031", "032"});
+	   JComboBox<String> emailCombo = new JComboBox<>(new String[]{"@(직접입력)", "@naver.com", "@daum.net", "@gmail.com"});
+       
+       String[] genders = {"성별","남","여"};
+       JComboBox<String> genderCombo = new JComboBox<String>(genders);
 
        /* 비밀번호 강도 표시기 */
        JProgressBar pwstIndicator = new JProgressBar(0, 100);
@@ -63,13 +85,18 @@ public class JoinFrame extends JFrame{
       JButton imgBtn = new JButton("이미지 선택");
       JButton joinBtn = new JButton("가입하기");
       JButton cancelBtn = new JButton("가입취소");
+  
       
       Client c = null;
       
-      final String joinTag = "JOIN";   //회원가입 기능 태그
-      final String overTag = "OVER";   //중복확인 기능 태그
-      final String pwTag = "SAFE";   //비밀번호 유효성 태그
-      final String imgTag = "IMAGE";
+      String role = "";
+      
+      final String joinTag = "JOIN";   		//회원가입 기능 태그
+      final String overTag = "OVER";   		//중복확인 기능 태그
+      final String pwTag = "SAFE";   		//비밀번호 유효성 태그
+      final String imgTag = "IMG";			//프로필 이미지
+      final String imgPathTag = "IMGPATH";	//이미지 절대경로
+      final String VimgTag = "VIMG";
          
       JoinFrame(Client _c) {
          c = _c;
@@ -82,10 +109,13 @@ public class JoinFrame extends JFrame{
          idL.setPreferredSize(new Dimension(100, 30));
          pwL.setPreferredSize(new Dimension(100, 30));
          pwConfirmL.setPreferredSize(new Dimension(100, 30));
+         genderL.setPreferredSize(new Dimension(40,30));
+         birthL.setPreferredSize(new Dimension(60,30));
+         phoneL.setPreferredSize(new Dimension(100, 30));
+         emailL.setPreferredSize(new Dimension(100, 30));
          postL.setPreferredSize(new Dimension(100, 30));
          roadL.setPreferredSize(new Dimension(100, 30));
          detailL.setPreferredSize(new Dimension(100, 30));
-         emailL.setPreferredSize(new Dimension(100, 30));
 
          /* TextField 크기 작업 */
          name.setPreferredSize(new Dimension(250, 30));
@@ -93,10 +123,12 @@ public class JoinFrame extends JFrame{
          id.setPreferredSize(new Dimension(185, 30));
          pw.setPreferredSize(new Dimension(185, 30));
          pwConfirm.setPreferredSize(new Dimension(185, 30));
+         phone1.setPreferredSize(new Dimension(80, 30));
+         phone2.setPreferredSize(new Dimension(80, 30));
+         email.setPreferredSize(new Dimension(150, 30));
          post.setPreferredSize(new Dimension(185, 30));
          road.setPreferredSize(new Dimension(250, 30));
          detail.setPreferredSize(new Dimension(250, 30));
-         email.setPreferredSize(new Dimension(250, 30));
 
          /* Button 크기 작업 */
          nnolBtn.setPreferredSize(new Dimension(60, 30));
@@ -107,15 +139,48 @@ public class JoinFrame extends JFrame{
          imgBtn.setPreferredSize(new Dimension(270, 30));
          joinBtn.setPreferredSize(new Dimension(135, 30));
          cancelBtn.setPreferredSize(new Dimension(135, 30));
+         
+         /* ComboBox 크기 및 위치 설정 */
+         phoneCombo.setPreferredSize(new Dimension(80, 30));
+         emailCombo.setPreferredSize(new Dimension(100, 30));
+         emailCombo.setMaximumRowCount(5);
+         
+         yearCombo.addItem("년도");
+         for(int i= 1910; i <= 2023;i++) {
+      	   String year = String.valueOf(i);
+      	   yearCombo.addItem(year);
+         }
+         yearCombo.setPreferredSize(new Dimension(70,30));
+         
+         monthCombo.addItem("월");
+         for(int i= 1; i <= 12;i++) {
+      	   String month = String.valueOf(i);
+      	   monthCombo.addItem(month);
+         }
+         monthCombo.setPreferredSize(new Dimension(50,30));
 
+         dayCombo.addItem("일");
+         for(int i= 1; i <= 31;i++) {
+      	   String day = String.valueOf(i);
+      	   dayCombo.addItem(day);
+         }
+         dayCombo.setPreferredSize(new Dimension(50,30));
+         
          /* 비밀번호 강도 표시기 설정 */
-         pwstL.setPreferredSize(new Dimension(100, 30));
-         pwstIndicator.setPreferredSize(new Dimension(250, 30));
+         pwstL.setPreferredSize(new Dimension(100, 0));
+         pwstIndicator.setPreferredSize(new Dimension(250, 15));
          pwstIndicator.setStringPainted(true);
           
          /* 프로필 이미지 설정 */
-         proImgL.setPreferredSize(new Dimension(290, 300));
+         proImgL.setPreferredSize(new Dimension(230, 240));
          proImgL.setHorizontalAlignment(SwingConstants.CENTER); // 레이블 내용 가운데 정렬
+         
+         // 레이블에 테두리 생성
+         Border border = LineBorder.createGrayLineBorder();
+         proImgL.setBorder(border);
+         
+         // 새로운 메서드를 호출하여 기본 프로필 이미지를 설정합니다.
+         setDefaultProfileImage();
            
          /* Panel 추가 작업 */
          setContentPane(panel);   //panel을 기본 컨테이너로 설정
@@ -139,6 +204,23 @@ public class JoinFrame extends JFrame{
          panel.add(pwConfirmL);
          panel.add(pwConfirm);
          panel.add(checkPwBtn);
+         
+         panel.add(genderL);
+         panel.add(genderCombo);
+         
+         panel.add(birthL);
+         panel.add(yearCombo);
+         panel.add(monthCombo);
+         panel.add(dayCombo);
+         
+         panel.add(phoneL);
+         panel.add(phoneCombo);
+         panel.add(phone1);
+         panel.add(phone2);
+
+         panel.add(emailL);
+         panel.add(email);
+         panel.add(emailCombo);
 
          panel.add(postL);
          panel.add(post);
@@ -148,9 +230,6 @@ public class JoinFrame extends JFrame{
          panel.add(road);
          panel.add(detailL);
          panel.add(detail);
-
-         panel.add(emailL);
-         panel.add(email);
 
          panel.add(proImgL);
          panel.add(imgBtn);
@@ -170,10 +249,17 @@ public class JoinFrame extends JFrame{
                 id.setText("");
                 pw.setText("");
                 pwConfirm.setText("");
+                genderCombo.setSelectedIndex(0);
+                yearCombo.setSelectedIndex(0);
+                monthCombo.setSelectedIndex(0);
+                dayCombo.setSelectedIndex(0);
+                phoneCombo.setSelectedIndex(0);
+                phone1.setText("");
+                phone2.setText("");
+                email.setText("");
                 post.setText("");
                 road.setText("");
                 detail.setText("");
-                email.setText("");
                 proImgL.setIcon(null);
 
                 dispose();
@@ -262,14 +348,40 @@ public class JoinFrame extends JFrame{
                 if (userSelection == JFileChooser.APPROVE_OPTION) {
                     File imageFile = fileChooser.getSelectedFile();
                     ImageIcon originalImageIcon = new ImageIcon(imageFile.getAbsolutePath());
-
-                    // 이미지 아이콘을 레이블 크기에 맞게 조절
                     Image originalImage = originalImageIcon.getImage();
                     Image scaledImage = originalImage.getScaledInstance(proImgL.getWidth(), proImgL.getHeight(), Image.SCALE_SMOOTH);
-                    ImageIcon scaledImageIcon = new ImageIcon(scaledImage);
-                    
-                    c.sendMsg(imgTag + "//" + imageFile.getAbsolutePath());
+                    ImageIcon  scaledImageIcon = new ImageIcon(scaledImage);
+   
+                    c.sendMsg(imgPathTag+"//"+imageFile.getAbsolutePath());
+                    c.sendMsg(imgTag+ "//"+ imageFile.getAbsolutePath() );
                     proImgL.setIcon(scaledImageIcon);
+                }
+            }
+        });
+        
+        /* ComboBox 이벤트 리스너 */
+        emailCombo.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // 가입취소 버튼을 눌렀을 때는 아무 작업도 수행하지 않고 종료
+                if (e.getSource() == cancelBtn) {
+                    return;
+                }
+
+                String selectedDomain = (String) emailCombo.getSelectedItem();
+
+                if ("@(직접입력)".equals(selectedDomain)) {
+                    // If "(직접입력)" is selected, prompt the user for their own domain
+                    String customDomain = JOptionPane.showInputDialog(null, "이메일 도메인을 입력합니다 :");
+                    if (customDomain != null && !customDomain.isEmpty()) {
+                        email.setText(email.getText() + "@" + customDomain);
+                    } else {
+                        // If the user cancels or enters an empty domain, revert the selection
+                        emailCombo.setSelectedItem(emailCombo.getItemAt(0)); // Select the first item "(직접입력)"
+                    }
+                } else {
+                    // Append selected email domain to the email field
+                    email.setText(email.getText() + selectedDomain);
                 }
             }
         });
@@ -323,14 +435,6 @@ public class JoinFrame extends JFrame{
         return Math.min(strength, 100); // 강도를 100으로 제한
     }
 
-     public static void setzipNoField(String postNo) {
-  		post.setText(postNo);
-  	}
-
-  	public static void setAddressField(String add) {
-  		road.setText(add);
-      }
-  	
       /* Button 이벤트 리스너 */
     class ButtonListener implements ActionListener{
        @Override
@@ -346,10 +450,18 @@ public class JoinFrame extends JFrame{
              upass = upass + pw.getPassword()[i];
           }
           String upwcon = String.valueOf(pwConfirm.getPassword());
+          String ugender =(String) genderCombo.getSelectedItem();
+          String uyear = (String) yearCombo.getSelectedItem();
+          String umonth = (String) monthCombo.getSelectedItem();
+          String uday = (String) dayCombo.getSelectedItem();
+          String uphone = (String) phoneCombo.getSelectedItem();
+          String uphone1 = phone1.getText();
+          String uphone2 = phone2.getText();
+          String uemail = email.getText();
           String upost = post.getText();
           String uroad = road.getText();
           String udetail = detail.getText();
-          String uemail = email.getText();
+          String urole = role;
 
           /* 가입취소 버튼 이벤트 */
           if(b.getText().equals("가입취소")) {
@@ -361,28 +473,49 @@ public class JoinFrame extends JFrame{
                id.setText("");
                pw.setText("");
                pwConfirm.setText("");
+               genderCombo.setSelectedIndex(0);
+               yearCombo.setSelectedIndex(0);
+               monthCombo.setSelectedIndex(0);
+               dayCombo.setSelectedIndex(0);
+               phoneCombo.setSelectedIndex(0);
+               phone1.setText("");
+               phone2.setText("");
+               email.setText("");
+               emailCombo.setSelectedIndex(0);
                post.setText("");
                road.setText("");
                detail.setText("");
-               email.setText("");
                proImgL.setIcon(null);
                
                dispose();
           }
           
           /* 가입하기 버튼 이벤트 */
-          else if(b.getText().equals("가입하기")) {
-             if(uname.equals("") || unick.equals("") || uid.equals("") || upass.equals("") || upwcon.equals("") || upost.equals("") || uroad.equals("") ||udetail.equals("") || uemail.equals("")) {
-                //모든 정보가 입력되지 않으면 회원가입 시도 실패
-                JOptionPane.showMessageDialog(null, "모든 정보를 기입해주세요", "회원가입 실패", JOptionPane.ERROR_MESSAGE);
-                System.out.println("[Client] 회원가입 실패 : 회원정보 미입력");
-             }
-             
-             else if(!uname.equals("") && !unick.equals("") && !uid.equals("") && !upass.equals("") && !upwcon.equals("") && !upost.equals("") && !uroad.equals("") && !udetail.equals("") && !uemail.equals("")) {
-                //회원가입 시도 성공
-                c.sendMsg(joinTag + "//" + uname + "//" + unick + "//" + uid + "//" + upass + "//" + upost + "//" + uroad + "//" + udetail + "//" + uemail);   //서버에 회원가입 정보 전송
-             }
+          else if (b.getText().equals("가입하기")) {
+              if (uname.equals("") || unick.equals("") || uid.equals("") || upass.equals("") || upwcon.equals("") || ugender.equals("성별") || uyear.equals("년도") || umonth.equals("월") || uday.equals("일") || uphone.equals("") || uphone1.equals("") || uphone2.equals("") || uemail.equals("") || upost.equals("") || uroad.equals("") || udetail.equals("")) {
+            	  // 모든 정보가 입력되지 않으면 회원가입 시도 실패
+                  JOptionPane.showMessageDialog(null, "모든 정보를 기입해주세요", "회원가입 실패", JOptionPane.ERROR_MESSAGE);
+                  System.out.println("[Client] 회원가입 실패 : 회원정보 미입력");
+              } else if (!uname.equals("") && !unick.equals("") && !uid.equals("") && !upass.equals("") && !upwcon.equals("") && !ugender.equals("성별") && !uyear.equals("년도") && !umonth.equals("월") && !uday.equals("일") && !unick.equals("") && !uphone.equals("") && !uphone2.equals("") && !uemail.equals("") && !upost.equals("") && !uroad.equals("") && !udetail.equals("")) {
+            	  
+            	  // 회원가입 시도 성공
+                  c.sendMsg(joinTag + "//" + uname + "//" + unick + "//" + uid + "//" + upass + "//" + ugender + "//" + uyear + "//" + umonth + "//" + uday + "//" + uphone + "//" + uphone1 + "//" + uphone2 + "//" + uemail + "//" + upost + "//" + uroad + "//" + udetail + "//" + urole);   // 서버에 회원가입 정보 전송
+              }
           }
-       }
     }
+
+    }
+	public static void setzipNoField(String selectedAddress) {
+	     post.setText( selectedAddress);
+	}
+
+	public static void setAddressField(String selectedAddress) {
+		 road.setText(selectedAddress);
+	}
+	
+	private void setDefaultProfileImage() {
+	    String defaultImagePath = "D:/hyuna/defalutimage.png";
+	    ImageIcon defaultImageIcon = new ImageIcon(defaultImagePath);
+
+	}
 }
