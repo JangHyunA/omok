@@ -52,6 +52,9 @@ public class AddressSearchFrame extends JDialog {
 	    * Create the dialog.
 	    */
 	   public AddressSearchFrame() {
+		   
+		  setTitle("우편번호 검색");
+		   
 	      setBounds(100, 100, 474, 300);
 	      getContentPane().setLayout(null);
 	      
