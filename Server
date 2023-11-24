@@ -2,6 +2,9 @@ package omok;
 
 import java.net.*;
 import java.util.*;
+
+import javax.swing.JOptionPane;
+
 import java.io.*;
 
 //클라이언트의 연결 요청 및 입출력을 상시 관리하는 클래스.
@@ -62,7 +65,8 @@ class CCUser extends Thread{
 	
 	String msg;			//수신 메시지를 저장할 필드
 	String nickname;	//클라이언트의 닉네임을 저장할 필드
-	long Port;
+	
+	String imgPath = "";
 	
 	Room myRoom;		//입장한 방 객체를 저장할 필드
 	
@@ -72,22 +76,20 @@ class CCUser extends Thread{
 	final String overTag = "OVER";		//중복확인
 	final String pwTag = "SAFE";		//비밀번호 유효성
 	final String postTag = "POST";		//우편번호
-	final String imgTag = "IMAGE";		//프로필이미지
+	final String imgTag = "IMG";		//프로필이미지
+	final String imgPathTag = "IMGPATH";	// 이미지 절대경로
+    final String VimgTag = "VIMG";
 	final String viewTag = "VIEW";		//회원정보조회
 	final String changeTag = "CHANGE";	//회원정보변경
-	final String adminTag = "ADMIN";  	//관리자 모드 접근
 	final String rankTag = "RANK";		//전적조회(전체회원)
 	final String croomTag = "CROOM";	//방생성
 	final String vroomTag = "VROOM";	//방목록
 	final String uroomTag = "UROOM";	//방유저
 	final String eroomTag = "EROOM";	//방입장
+	final String sroomTag = "SROOM"; 	//방 관전
 	final String cuserTag = "CUSER";	//접속유저
 	final String chatTag = "CHAT";		//채팅하기
 	final String searchTag = "SEARCH";	//전적조회(한명)
-	final String resetpwTag = "RESET";	//비밀번호 초기화
-	final String exitroomTag = "EXIT";	//강제 퇴장하기
-	final String endroomTag = "END";	//강제 종료하기
-	final String outgameTag = "OUT";	//강제 탈퇴하기
 	final String omokTag = "OMOK";		//오목
 	final String blackTag = "BLACK";	//검은색 돌
 	final String whiteTag = "WHITE";	//흰색 돌
@@ -96,6 +98,19 @@ class CCUser extends Thread{
 	final String pexitTag = "PEXIT";	//프로그램종료
 	final String rexitTag = "REXIT";	//방퇴장
 	final String recordTag = "RECORD";	//전적업데이트
+	
+	//================ 관리자 모드 ===================//
+	final String adminTag = "ADMIN";  	//관리자 모드 접근
+	final String juserTag = "JUSER"; // 회원가입된 모든유저
+	final String searchuserTag = "SEARCHUSER";	//회원 조회하기
+	final String resetpwTag = "RESET";	//비밀번호 초기화
+	final String exitroomTag = "EXIT";	//강제 퇴장하기
+	final String exitroomUserTag = "EXITUSER";  // 강제 퇴장 회원 선택 
+	final String exitroomToUserTag = "EXITTUSER"; 	// 강제 퇴장당한 회원 
+	final String stayuserTag = "STAYUSER"; // 남아있는 회원
+	final String endroomTag = "END";	//강제 종료하기
+	final String endroomUserTag = "ENDUSER"; 	// 강제종료 회원
+	final String outgameTag = "OUT";	//강제 탈퇴하기
 	
 	CCUser(Socket _s, Server _ss) {
 		this.socket = _s;
@@ -150,12 +165,26 @@ class CCUser extends Thread{
 				
 				/* 이미지 파일 변환  */
 				else if(m[0].equals(imgTag)) {
-					_img = db.imgCheck(m[1]);
+					FileInputStream fis = null;
+					try {
+						File imgFile = new File(m[1]);
+						fis = new FileInputStream(imgFile);
+						System.out.println(fis);
+					} catch (FileNotFoundException e) {		
+						e.printStackTrace();
+					}
+					_img = fis;
+				
+				}
+				
+				else if(m[0].equals(imgPathTag)) {
+					imgPath = m[1];
 				}
 				
 				/* 회원가입 */
 				else if(m[0].equals(joinTag)) {
-					if(db.joinCheck(m[1], m[2], m[3], m[4], m[5], m[6], m[7], m[8], _img)) {	//회원가입 성공
+			
+					if(db.joinCheck(m[1], m[2], m[3], m[4], m[5], m[6], m[7], m[8],m[9], m[10], m[11], m[12], m[13], m[14], m[15], m[16], _img, imgPath)) {	//회원가입 성공
 						dos.writeUTF(joinTag + "//OKAY");
 					}
 					
@@ -186,7 +215,6 @@ class CCUser extends Thread{
 	               }
 	            }
 				
-				
 				/* 회원정보 조회 */
 				else if(m[0].equals(viewTag)) {
 					if(!db.viewInfo(nickname).equals("null")) {	//조회 성공
@@ -195,6 +223,16 @@ class CCUser extends Thread{
 					
 					else {	//조회 실패
 						dos.writeUTF(viewTag + "//FAIL");
+					}
+				}
+				
+				/* 프로필 이미지 - 절대 경로로 조회*/
+				else if(m[0].equals(VimgTag)) {
+					if(!db.viewImg(nickname).equals("null")) {
+						dos.writeUTF(VimgTag+"//"+db.viewImg(nickname));
+					}
+					else {
+						dos.writeUTF(VimgTag+"//FAIL");
 					}
 				}
 				
@@ -209,28 +247,7 @@ class CCUser extends Thread{
 					}
 				}
 				
-				
-				/* 관리자 모드 접근 */
-				else if(m[0].equals(adminTag)) {
-					if(!db.adminCheck(nickname, m[1]).equals("null")) {
-						dos.writeUTF(adminTag+"//"+ db.adminCheck(nickname, m[1]));
-					}
-					else {
-						dos.writeUTF(adminTag+ "//FAIL");
-					}
-				}
-				
-				/* 비밀번호 초기화 - 관리자 권한 */
-				else if(m[0].equals(resetpwTag)) {
-					if(db.resetPw(nickname, m[1])) {	//변경 성공
-						dos.writeUTF(resetpwTag + "//OKAY");
-					}
-					
-					else {	//변경 실패
-						dos.writeUTF(resetpwTag + "//FAIL");
-					}
-				}
-				
+			
 				/* 전체 전적 조회 */
 				else if(m[0].equals(rankTag)) {
 					if(!db.viewRank().equals("")) {	//조회 성공
@@ -253,7 +270,7 @@ class CCUser extends Thread{
 					myRoom.ccu.add(this);	//myRoom의 접속인원에 클라이언트 추가
 					wuser.remove(this);		//대기실 접속 인원에서 클라이언트 삭제
 					
-					dos.writeUTF(croomTag + "//OKAY");
+					dos.writeUTF(croomTag + "//OKAY//"+nickname);
 					System.out.println("[Server] "+ nickname + " : 방 '" + m[1] + "' 생성");
 					
 					sendWait(roomInfo());	//대기실 접속 인원에 방 목록을 전송
@@ -269,26 +286,56 @@ class CCUser extends Thread{
 							if(r.count < 2) {			//방 인원수가 2명보다 적을 때 입장 성공
 								myRoom = room.get(i);	//myRoom에 두 조건이 맞는 i번째 room을 초기화
 								myRoom.count++;			//방의 인원수 하나 추가
+							
 								
 								wuser.remove(this);		//대기실 접속 인원에서 클라이언트 삭제
 								myRoom.ccu.add(this);	//myRoom의 접속 인원에 클라이언트 추가
-								
 								sendWait(roomInfo());	//대기실 접속 인원에 방 목록을 전송
 								sendRoom(roomUser());	//방에 입장한 인원에 방 인원 목록을 전송
 								
-								dos.writeUTF(eroomTag + "//OKAY");
-								System.out.println("[Server] " + nickname + " : 방 '" + m[1] + "' 입장");
+								dos.writeUTF(eroomTag + "//OKAY//"+nickname+"//"+" ");
+								System.out.println("[Server] " + nickname + "님 - 방 '" + m[1] + "' 입장");
+								break;
 							}
-							
-							else {	//방 인원수가 2명 이상이므로 입장 실패
-								dos.writeUTF(eroomTag + "//FAIL");
-								System.out.println("[Server] 인원 초과. 입장 불가능");
+							else if ( r.count >= 2) {
+								dos.writeUTF(eroomTag+"//SHOW//"+nickname+"//"+ r.title);
+								System.out.println("[Server] 인원초과. 관전모드 입장");
+								break;
+							}
+							else {	// 입장 & 관전모드 입장 초과
+								dos.writeUTF(eroomTag + "//FAIL//"+" "+"//"+" ");
+								System.out.println("[Server] " + nickname + " : 방 '" + m[1] + "' 입장 오류");
+								break;
 							}
 						}
-						
+						/*
 						else {	//같은 방 제목이 없으니 입장 실패
-							dos.writeUTF(eroomTag + "//FAIL");
+							dos.writeUTF(eroomTag + "//FAIL//"+" "+"//"+" ");
 							System.out.println("[Server] " + nickname + " : 방 '" + m[1] + "' 입장 오류");
+						}
+						*/
+					}
+				}
+
+				/* 관전모드로 방 입장 */
+				else if(m[0].equals(sroomTag)) {
+					for(int i =0; i<room.size();i++) {
+						Room r = room.get(i);
+						if(r.title.equals(m[2])) {
+							myRoom = room.get(i);
+							myRoom.count++;
+							
+							wuser.remove(this);
+							myRoom.ccu.add(this);
+							sendWait(roomInfo());	
+							sendRoom(roomUser());
+							
+							dos.writeUTF(sroomTag+ "//OKAY//"+nickname);
+							System.out.println("[Server]"+ nickname+"님 - 방 '"+ m[2]+"' 관전모드로 입장");
+						}
+						else {
+							dos.writeUTF(sroomTag+"//FAIL//"+ " ");						
+							System.out.println("[Server]"+ nickname+"님 - 방 '"+ m[2]+"' 관전모드 입장 오류");
 						}
 					}
 				}
@@ -308,22 +355,25 @@ class CCUser extends Thread{
 				
 				/* 채팅 기능*/
 				else if (m[0].equals(chatTag)) {
-					String str = m[1];
-					int i=0;
-					while(i<myRoom.ccu.size()) {
-						try {
-							if (this == myRoom.ccu.get(i)) {
-								myRoom.ccu.get(1).dos.writeUTF(chatTag+"//"+str); 
-							
-							}else {
-								myRoom.ccu.get(0).dos.writeUTF(chatTag+"//"+str); 
-							
+					String rName = m[1];
+					String nName = m[2];
+					String str = m[3];
+					for(int i =0 ; i<room.size();i++) {
+						Room r = room.get(i);
+						if(r.title.equals(rName)) {
+							myRoom = r;
+							int s = 0;
+							while(s<myRoom.ccu.size()) {
+								try {
+									if(!myRoom.ccu.get(s).nickname.equals(nName)) {	//발신자를 제외한 접속 회원
+										myRoom.ccu.get(s).dos.writeUTF(chatTag+"//"+nName+"//"+str);
+									}
+									s++;
+								}catch(IOException e) {
+									e.printStackTrace();
+								}
 							}
-							i++;
-							
-						}catch(IOException e) {
-							e.printStackTrace();
-						}	
+						}
 					}
 				}
 				
@@ -356,25 +406,6 @@ class CCUser extends Thread{
 					sendWait(connectedUser());	//대기실 접속 인원에 전체 접속 인원을 전송
 				}
 				
-				/* 관리자 권한으로 방 강제 종료
-				else if(m[0].equals(endroomTag)) {
-					myRoom.ccu.remove(this);	//myRoom의 접속 인원에서 클라이언트 삭제
-					myRoom.count--;				//myRoom의 인원수 하나 삭제
-					wuser.add(this);			//대기실 접속 인원에 클라이언트 추가
-					
-					System.out.println("[Server] " + nickname + " : 방 '" + myRoom.title + "' 퇴장");
-					
-					if(myRoom.count==0) {	//myRoom의 인원수가 0이면 myRoom을 room 배열에서 삭제
-						room.remove(myRoom);
-					}
-					
-					if(room.size() != 0) {	//생성된 room의 개수가 0이 아니면 방에 입장한 인원에 방 인원 목록을 전송
-						sendRoom(roomUser());
-					}
-					
-					sendWait(roomInfo());		//대기실 접속 인원에 방 목록을 전송
-					sendWait(connectedUser());	//대기실 접속 인원에 전체 접속 인원을 전송
-				} */
 				
 				/* 오목 */
 				else if(m[0].equals(omokTag)) {
@@ -441,11 +472,197 @@ class CCUser extends Thread{
 						}
 					}
 				}
-			}
+				
+				// ======================= 관리자 모드 ==========================//
+				/* 관리자 모드 접근 */
+				else if(m[0].equals(adminTag)) {
+					if(!db.adminCheck(nickname, m[1]).equals("null")) {
+						dos.writeUTF(adminTag+"//"+ db.adminCheck(nickname, m[1]));
+						System.out.println(this);
+					}
+					else {
+						dos.writeUTF(adminTag+ "//FAIL");
+					}
+				}
+				
+				/* 회원가입된 모든 회원 조회 */
+				else if(m[0].equals(juserTag)) {
+					if(!db.joinUser().equals("")) {
+						dos.writeUTF(juserTag+"//"+db.joinUser());
+					}
+					else {
+						dos.writeUTF(juserTag+"//FAIL");
+					}
+				}
+			
+				/* 접속 인원 조회 */
+				else if(m[0].equals(cuserTag)) {
+					String msg = "";
+					for(int i=0; i<auser.size(); i++) {
+						msg = msg + auser.get(i).nickname + "@";
+					}
+					for(int i=0; i<wuser.size(); i++) {
+						try {
+							wuser.get(i).dos.writeUTF(msg);
+						} catch(IOException e) {
+							wuser.remove(i--);
+						}
+					}
+					
+				}
+	
+				/* 비밀번호 초기화 - 관리자 권한 */
+				else if(m[0].equals(resetpwTag)) {
+					if(db.resetPw( m[1],m[2])) {	//변경 성공
+						dos.writeUTF(resetpwTag + "//OKAY");
+					}
+					
+					else {	//변경 실패
+						dos.writeUTF(resetpwTag + "//FAIL");
+					}
+				}
+				
+				/* 강제 퇴장 이벤트*/
+				else if(m[0].equals(exitroomTag)) {
+					String msg = "";
+					String selRoom = m[1];
+					
+					for(int i = 0 ; i < room.size() ; i++ ) {
+						Room r = room.get(i);
+						// 선택된 방 클릭 
+						if(r.title.equals(m[1])) {
+								for (int u =0; u<r.count;u++) {
+									msg = msg + r.ccu.get(u).nickname + "@";
+								}
+								dos.writeUTF(exitroomTag+"//"+selRoom+"//"+msg);
+										
+						}
+					}
+				}
+				
+				/* 강제 퇴장 - 유저 선택 후 */
+				else if(m[0].equals(exitroomUserTag)) {
+					String selRoom = m[1];
+					String selUser = m[2];
+					
+					for(int i=0;i<room.size(); i++) {
+						Room r = room.get(i);
+						
+						if(r.title.equals(selRoom)) {	// 방 선택
+							
+							// 해당 방에서 퇴장할 회원 찾기
+							for(int j=0; j<r.ccu.size();j++) {
+								if(r.ccu.get(j).nickname.equals(selUser)) { 	// 선택 회원 확인
+									r.ccu.get(j).dos.writeUTF(exitroomToUserTag+"//"+selUser);		//강제 퇴장당한 회원에게 메세지
+									r.ccu.remove(j);		// 선택 회원 삭제
+									r.count--;				// 인원수 1 감소
+									wuser.add(r.ccu.get(i));
+								}
+								// 전체 인원에서 1명 감소 
+								/* 경우의 수 
+								 * 1 ) 2명 -> 1명 : 상관x
+								 * 2 ) 1명 -> 0명 : 방을 삭제 -> 다음 경우로 연관
+								 */
+								if( r.count == 0) {		// 1감소 후 인원 0명
+										room.remove(r);
+										sendWait(roomInfo());
+									}
+							}
+							// 전체 방 목록의 갯수
+							/* 방 목록의 갯수가 0개가 아닌 경우
+							 * 
+							 */
+							if(room.size() != 0) {		// 클라이언트가 입장한 방의 인원 
+									String msg = uroomTag + "//";
+									for(int k=0; k<r.ccu.size() ; k++) {
+										msg += r.ccu.get(k).nickname+ "@";
+									}
+									
+									for(int t =0; t<r.ccu.size();t++) {	// 남아 있는 회원들의 목록 출력
+										try {
+											r.ccu.get(t).dos.writeUTF(msg);
+											r.ccu.get(t).dos.writeUTF(stayuserTag+"//"+ selRoom+"//"+selUser+"//"+r.ccu.get(t).nickname);
+										}catch(IOException e) {
+											r.ccu.remove(t--);
+										}
+									}
+							}	// room.size() != 0 
+							
+							sendWait(roomInfo());
+							sendWait(connectedUser());
+							
+							dos.writeUTF(exitroomUserTag+"//OKAY//"+selUser);
+						}		
+					}
+				}
+			
+				/* 관리자 권한으로 방 강제 종료*/
+				else if(m[0].equals(endroomTag)) {
+					for (int i=0; i<room.size();i++) {
+						Room r = room.get(i);
+						
+						if(r.title.equals(m[1])) {
+							for(int j =0; j< r.ccu.size();j++) {
+								r.ccu.get(j).dos.writeUTF(endroomUserTag+"//OKAY");
+								wuser.add(r.ccu.get(j));
+							}
+							
+							for(int k =0;k<r.ccu.size();k++) {
+								r.ccu.remove(k);
+							}
+							r.count =0;
+							room.remove(r);
+						}
+						sendWait(roomInfo());
+			//			sendWait(connectedUser());
+						dos.writeUTF(endroomTag + "//OKAY//"+r);
+					}
+				}
+				
+				/* 관리자 권한으로 회원 강제 탈퇴 */
+				else if(m[0].equals(outgameTag)) {
+					if(db.OutUser(m[1])) {
+						String msg =  cuserTag + "//";
+						// 접속 되어 있는 회원에게서 삭제
+						for(int i=0; i<auser.size(); i++) {
+							if(auser.get(i).nickname.equals(m[1])) {
+								auser.remove(i);
+							}else {
+								msg += auser.get(i).nickname + "@";
+							}
+						}
+						// 대기실에 있는 회원에게서 삭제
+						for(int j =0; j<wuser.size(); j++) {
+							if(wuser.get(j).nickname.equals(m[1])) {								
+								wuser.remove(j);
+							}else {
+								try {
+									wuser.get(j).dos.writeUTF(msg);
+								}catch(IOException e) {
+									wuser.remove(j--);
+								}
+							}
+						}
+						dos.writeUTF(outgameTag+"//OKAY");
+					}
+					else {
+						dos.writeUTF(outgameTag+"//FAIL");
+					}
+				}
+				
+			} // while(True) 
 			
 		} catch(IOException e) {
 			System.out.println("[Server] 입출력 오류 > " + e.toString());
 		}
+	}
+	
+	void setImgPath(String _m) {
+		imgPath = _m;
+	}
+	
+	String getImgPath() {
+		return imgPath;
 	}
 	
 	/* 현재 존재하는 방의 목록을 조회 */
@@ -463,12 +680,12 @@ class CCUser extends Thread{
 		String msg = uroomTag + "//";
 		
 		for(int i=0; i<myRoom.ccu.size(); i++) {
-			msg = msg + myRoom.ccu.get(i).nickname + "@";
+			msg = msg +  myRoom.ccu.get(i).nickname+ "@";
 		}
 		return msg;
 	}
 	
-	/* 접속한 모든 회원 목록을 조회 */
+	/*( 로그인) 접속한 모든 회원 목록을 조회 */
 	String connectedUser() {
 		String msg = cuserTag + "//";
 		
