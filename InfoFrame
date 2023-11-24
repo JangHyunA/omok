@@ -12,7 +12,8 @@ public class InfoFrame extends JFrame{
 	/* Label */
 	JLabel nameL = new JLabel("이름");
 	JLabel nicknameL = new JLabel("닉네임");
-	JLabel emailL = new JLabel("이메일");
+	JLabel emailL = new JLabel("이메일");       
+	JLabel proImgL = new JLabel();
 	
 	/* TextField */
 	JTextField name = new JTextField();
@@ -22,10 +23,15 @@ public class InfoFrame extends JFrame{
 	/* Button */
 	JButton viewBtn = new JButton("조회하기");
 	JButton exitBtn = new JButton("나가기");
+	JButton imgBtn = new JButton ("프로필 이미지");
 	
 	Client c = null;
 	
-	final String viewTag = "VIEW";	//회원 정보 조회 기능 태그
+	ImageIcon img ;
+	
+	final String viewTag = "VIEW";			//회원 정보 조회 기능 태그
+	final String VimgTag = "VIMG";
+	final String imgPathTag = "IMGPATH";	// 이미지 절대경로
 	
 	InfoFrame(Client _c) {
 		c = _c;
@@ -47,10 +53,16 @@ public class InfoFrame extends JFrame{
 		email.setEditable(false);
 		
 		/* Button 크기 작업 */
-		viewBtn.setPreferredSize(new Dimension(250, 25));
-		exitBtn.setPreferredSize(new Dimension(250, 25));
+		viewBtn.setPreferredSize(new Dimension(270, 25));
+		exitBtn.setPreferredSize(new Dimension(270, 25));
+		imgBtn.setPreferredSize(new Dimension(270,25));
 		
-		/* panel 추가 작업 */
+		/* 프로필 이미지 설정 */
+		proImgL.setPreferredSize(new Dimension(250, 280));
+	    proImgL.setHorizontalAlignment(SwingConstants.CENTER); // 레이블 내용 가운데 정렬		
+	
+		
+	    /* panel 추가 작업 */
 		setContentPane(panel);	//panel을 기본 컨테이너로 설정
 		
 		panel.add(nameL);
@@ -64,6 +76,10 @@ public class InfoFrame extends JFrame{
 		
 		panel.add(viewBtn);
 		panel.add(exitBtn);
+		panel.add(imgBtn);
+
+		panel.add(proImgL);
+
 		
 		/* Button 이벤트 작업 */
 		viewBtn.addActionListener(new ActionListener() {
@@ -86,10 +102,21 @@ public class InfoFrame extends JFrame{
                 name.setEditable(false);
                 nickname.setEditable(false);
                 email.setEditable(false);
+                proImgL.setIcon(null);
 			}
 		});
 		
-		setSize(280, 210);
+		imgBtn.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				System.out.println("[Client] 회원 프로필 이미지 조회 시도");
+				//c.sendMsg(VimgTag+"//");
+				c.sendMsg(VimgTag+"//");
+			}
+		});
+		
+		setSize(300, 530);
 		setLocationRelativeTo(null);
 		setResizable(false);
 	}
