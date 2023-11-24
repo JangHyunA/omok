@@ -64,22 +64,8 @@ public class Database {
 		return nickname;	//nickname 반환
 	}
 	
-	FileInputStream imgCheck(String _img) {
-		FileInputStream fis = null;
-		try {
-			File imgFile = new File(_img);
-			fis = new FileInputStream(imgFile);
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		System.out.println(fis);
-		return fis;
-	}
-	
-	
 	//회원가입을 수행하는 메소드. 회원가입에 성공하면 true, 실패하면 false를 반환한다.
-	boolean joinCheck(String _n, String _nn, String _i, String _p, String _o, String _r, String _d, String _e, FileInputStream _img) {
+	boolean joinCheck(String _n, String _nn, String _i, String _p, String _g, String _y, String _m, String _day, String _ph, String _p1, String _p2, String _e, String _o, String _r, String _d, String _role, FileInputStream _img, String _imgP) {
 		boolean flag = false;	//참거짓을 반환할 flag 변수. 초기값은 false
 		
 		//매개변수로 받은 각 문자열들을 각 변수에 초기화한다.
@@ -87,30 +73,76 @@ public class Database {
 		String nn = _nn;
 		String id = _i;
 		String pw = _p;
+		String ge = _g;
+		String year = _y;
+		String month = _m;
+		String day = _day;
+		String ph = _ph;
+		String p1 = _p1;
+		String p2 = _p2;
+		String em = _e;
 		String po = _o;
 		String ro = _r;
 		String de = _d;
-		String em = _e;
+		String role = _role;
+		String imgP = _imgP;
+
 		
 		try {
 			//member 테이블에 각 문자열들을 순서대로 업데이트하는 문장. 승, 패는 초기값을 숫자 0으로 한다.
+			if ( role.equals("일반회원")) {
+				PreparedStatement pre = con.prepareStatement("INSERT INTO member(name, nickname, id, password, gender, year, month, day, phone, phone1, phone2, email, post, road, detail, img, imgpath, role, win, lose) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+				
+				pre.setString(1, na);
+				pre.setString(2, nn);
+				pre.setString(3, id);
+				pre.setString(4, pw);
+				pre.setString(5, ge);
+				pre.setString(6, year);
+				pre.setString(7, month);
+				pre.setString(8, day);
+				pre.setString(9, ph);
+				pre.setString(10, p1);
+				pre.setString(11, p2);
+				pre.setString(12, em);
+				pre.setString(13, po);
+				pre.setString(14, ro);
+				pre.setString(15, de);
+				pre.setBinaryStream(16, _img);
+				pre.setString(17, imgP);
+				pre.setString(18, "USER");
+				pre.setInt(19, 0);
+				pre.setInt(20, 0);
+				pre.executeUpdate();
+				pre.close();
+				
+			}else if(role.equals("관리자")){ 	// 관리자 
+				PreparedStatement pre = con.prepareStatement("INSERT INTO member(name, nickname, id, password, gender, year, month, day, phone, phone1, phone2, email, post, road, detail, img, imgpath, role, win, lose, admin_code) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 			
-			PreparedStatement pre = con.prepareStatement("INSERT INTO member(name, nickname, id, password, post, road, detail, email, img, role, win, lose) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-			pre.setString(1, na);
-			pre.setString(2, nn);
-			pre.setString(3, id);
-			pre.setString(4, pw);
-			pre.setString(5, po);
-			pre.setString(6, ro);
-			pre.setString(7, de);
-			pre.setString(8, em);
-			pre.setBinaryStream(9, _img);
-			pre.setString(10, "USER");
-			pre.setInt(11, 0);
-			pre.setInt(12, 0);
-			pre.executeUpdate();
-			pre.close();
-			
+				pre.setString(1, na);
+				pre.setString(2, nn);
+				pre.setString(3, id);
+				pre.setString(4, pw);
+				pre.setString(5, ge);
+				pre.setString(6, year);
+				pre.setString(7, month);
+				pre.setString(8, day);
+				pre.setString(9, ph);
+				pre.setString(10, p1);
+				pre.setString(11, p2);
+				pre.setString(12, em);
+				pre.setString(13, po);
+				pre.setString(14, ro);
+				pre.setString(15, de);
+				pre.setBinaryStream(16, _img);
+				pre.setString(17, imgP);
+				pre.setString(18, "ADMIN");
+				pre.setInt(19, 0);
+				pre.setInt(20, 0);
+				pre.setString(21,"admin1234");
+				pre.executeUpdate();
+				pre.close();
+			}
 			flag = true;	//업데이트문이 정상적으로 수행되면 flag를 true로 초기화하고 성공을 콘솔로 알린다.
 			System.out.println("[Server] 회원가입 성공");
 		} catch(Exception e) {	//회원가입 절차를 수행하지 못하면 flag를 false로 초기화하고 실패를 콘솔로 알린다.
@@ -165,7 +197,7 @@ public class Database {
           else {
              flag = false;
           }
-       System.out.println("[Server] 비밀번호 유효성 검사 성공");
+          System.out.println("[Server] 비밀번호 유효성 검사 성공");
        }catch(Exception e) {
           System.out.println("[Server] 비밀번호 유효성 검사 실패 > "+ e.toString());
        }
@@ -199,13 +231,32 @@ public class Database {
 		return msg;	//msg 반환
 	}
 	
+	String viewImg(String _nn) {
+		String path = "null";
+		
+		String nick = _nn;
+		
+		try {
+			String viewStr = "SELECT imgpath FROM member WHERE nickname = '"+nick+"'";
+			ResultSet result = stmt.executeQuery(viewStr);
+			
+			while(result.next()) {
+				path = result.getString("imgpath");		
+			}
+			System.out.println("[Server] 이미지 조회 성공 ");
+		}catch(Exception e){
+			System.out.println("[Server] 이미지 조회 실패 > "+ e.toString());
+		}
+		return path;
+	}
+	
 	//회원정보를 변경을 수행하는 메소드. 변경에 성공하면 true, 실패하면 false를 반환한다.
 	boolean changeInfo(String _nn, String _a, String _v) {
 		boolean flag = false;	//참거짓을 반환할 flag 변수. 초기값은 false.
 		
 		//매개변수로 받은 정보들을 초기화한다. att는 속성(이름, 이메일, 비밀번호) 구분용이고 val은 바꿀 값.
 		String nick = _nn;
-		String att = _a;
+		String att = _a; 
 		String val = _v;
 		
 		try {
@@ -222,61 +273,7 @@ public class Database {
 		
 		return flag;	//flag 반환
 	}
-	
-	/*
-	 * 관리자 접근은 
-	 * admin_code 로 관리자 권한이 주어진 사람에게 부여되는 코드로 입장이 가능합니다. 
-	 * 따라서, ADMIN 권한이 있어도, 각 관리자에게 주어진 코드 번호가 없으면 입장이 불가능합니다.
-	 * 또한, 코드번호를 알아도, ADMIN 권한이 존재하지 않는다면 권한이 불가능합니다. 
-	 * 
-	 * 관리자 모드 접근 성공시, 안내 문구로 관리자의 이름이 함께 노출 됩니다. 
-	 */	
-	
-	/* 일반 사용자/관리자를 구분하는 메소드 */
-	String adminCheck(String _n, String code) {
-		String nick = _n; 
-		String name = "null";
 
-		try {
-				String selectStr = "SELECT name FROM member WHERE admin_code='" + code + "' and nickname ='" + nick + "' and role = 'ADMIN'";
-				ResultSet result = stmt.executeQuery(selectStr);
-				
-				while(result.next()) {
-						name = result.getString("name");
-				} 
-					System.out.println("[Server] 관리자 조회 성공");
-			
-		}catch(Exception e) {
-			System.out.println("[Server] 조회 실패 > "+ e.toString());
-			
-		}
-		return name;
-	}
-	
-	//비밀번호를 초기화하는 메소드. 변경에 성공하면 true, 실패하면 false를 반환한다.
-	boolean resetPw(String _nn, String _a) {
-		boolean flag = false;	//참거짓을 반환할 flag 변수. 초기값은 false.
-			
-		//매개변수로 받은 정보들을 초기화한다. att는 속성(이름, 이메일, 비밀번호) 구분용이고 val은 바꿀 값.
-		String nick = _nn;
-		String att = _a;
-		String pw = "Newpw0000!";
-			
-		try {
-			//member 테이블에서 nick이라는 닉네임을 가진 회원의 att(이름, 이메일, 비밀번호)를 val로 변경한다.
-			String resetPw = "UPDATE member SET " + att + "='" + pw + "' WHERE nickname='" + nick +"'";
-			stmt.executeUpdate(resetPw);
-				
-			flag = true;	//정상적으로 수행되면 flag를 true로 바꾸고 성공을 콘솔로 알린다.
-			System.out.println("[Server-Admin] 비밀번호 초기화 성공");
-		} catch(Exception e) {	//정상적으로 수행하지 못하면 flag를 false로 바꾸고 실패를 콘솔로 알린다.
-			flag = false;
-			System.out.println("[Server-Admin] 비밀번호 초기화 실패 > " + e.toString());
-		}
-			
-		return flag;	//flag 반환
-	}
-	
 	//전체 회원의 전적을 조회하는 메소드. 모든 회원의 전적을 String 형태로 반환한다.
 	String viewRank() {
 		String msg = "";	//전적을 받을 문자열. 초기값은 ""로 한다.
@@ -393,4 +390,103 @@ public class Database {
 		
 		return flag;	//flag 반환
 	}
+	// ======================= 관리자 모드 ====================================//
+	
+	/*
+	 * 관리자 접근은 
+	 * admin_code 로 관리자 권한이 주어진 사람에게 부여되는 코드로 입장이 가능합니다. 
+	 * 따라서, ADMIN 권한이 있어도, 각 관리자에게 주어진 코드 번호가 없으면 입장이 불가능합니다.
+	 * 또한, 코드번호를 알아도, ADMIN 권한이 존재하지 않는다면 권한이 불가능합니다. 
+	 * 
+	 * 관리자 모드 접근 성공시, 안내 문구로 관리자의 이름이 함께 노출 됩니다. 
+	 */	
+	
+	/* 일반 사용자/관리자를 구분하는 메소드 */
+	String adminCheck(String _n, String code) {
+		String nick = _n; 
+		String name = "null";
+
+		try {
+				String selectStr = "SELECT name FROM member WHERE admin_code='" + code + "' and nickname ='" + nick + "' and role = 'ADMIN'";
+				ResultSet result = stmt.executeQuery(selectStr);
+				
+				while(result.next()) {
+						name = result.getString("name");
+				} 
+					System.out.println("[Server] 관리자 조회 성공");
+			
+		}catch(Exception e) {
+			System.out.println("[Server] 조회 실패 > "+ e.toString());
+			
+		}
+		return name;
+	}
+	
+	
+	String joinUser() {
+		String msg = "";
+		try {
+			String selectStr = "SELECT nickname FROM member";
+			ResultSet result = stmt.executeQuery(selectStr);
+			
+			while(result.next()) {
+				msg += result.getString("nickname")+"@";
+			}
+			System.out.println("[Server] 가입된 전체 회원 조회 성공");
+			
+		}catch(Exception e) {
+			System.out.println("[Server] 가입된 전체 회원 조회 실패 > "+ e.toString());
+		}
+	
+		return msg;
+	}
+
+	
+	//비밀번호를 초기화하는 메소드. 변경에 성공하면 true, 실패하면 false를 반환한다.
+	boolean resetPw(String _a, String _nn) {
+		boolean flag = false;	//참거짓을 반환할 flag 변수. 초기값은 false.
+			
+		//매개변수로 받은 정보들을 초기화한다. att는 속성(이름, 이메일, 비밀번호) 구분용이고 val은 바꿀 값.
+		String nick = _nn; 
+		String att = _a;  // password
+		String pw = "1234";
+			
+		try {
+			//member 테이블에서 nick이라는 닉네임을 가진 회원의 att(이름, 이메일, 비밀번호)를 val로 변경한다.
+			String resetPw = "UPDATE member SET " + att + "='" + pw + "' WHERE nickname='" + nick +"'";
+			stmt.executeUpdate(resetPw);
+				
+			flag = true;	//정상적으로 수행되면 flag를 true로 바꾸고 성공을 콘솔로 알린다.
+			System.out.println("[Server-Admin] 비밀번호 초기화 성공");
+		} catch(Exception e) {	//정상적으로 수행하지 못하면 flag를 false로 바꾸고 실패를 콘솔로 알린다.
+			flag = false;
+			System.out.println("[Server-Admin] 비밀번호 초기화 실패 > " + e.toString());
+		}
+			
+		return flag;	//flag 반환
+	}
+	
+	// 관리자 모드 - 회원 강제 탈퇴 
+	boolean OutUser(String _m) {
+		
+		String nick = _m;
+		boolean flag = false;
+		try {
+			String deleteStr = "DELETE FROM member WHERE nickname = '"+nick+"'";
+			stmt.executeUpdate(deleteStr);
+			
+			flag= true;
+			System.out.println("[Server_admin] 회원 강제 탈퇴 성공");
+				
+		}catch(Exception e) {
+			flag= false ;
+			System.out.println("[Server_admin] 회원 강제 탈퇴 실패 > "+ e.toString());
+		}
+		
+		return flag;
+	
+	}
+	
+	
+	
 }
