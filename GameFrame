@@ -15,7 +15,7 @@ public class GameFrame extends JFrame{
 	JPanel eastPanel = new JPanel();
 	
 	/* List */
-	JList<String> everyuserList = new JList<String>();
+	JList<String> userList = new JList<String>();
 	JList<String> playerList1 = new JList<String>();
 	JList<String> playerList2 = new JList<String>();
 	
@@ -44,6 +44,7 @@ public class GameFrame extends JFrame{
 	Client c = null;
 	
 //	final String searchTag = "SEARCH";	//전적 조회 기능 태그
+	final String uroomTag = "UROOM";
 	final String rexitTag = "REXIT";	//방 퇴장 기능 태그
 	final String omokTag = "OMOK";		//오목 기능 태그
 	final String blackTag = "BLACK";	//검정색 돌 태그
@@ -168,27 +169,23 @@ public class GameFrame extends JFrame{
 		chatBtn.addActionListener(bl);
 		userBtn.addActionListener(bl);
 //		searchBtn.addActionListener(bl);
+
 		
 		/* Mouse 이벤트 리스너 추가 */
 		DolAction da = new DolAction();
 		centerPanel.addMouseListener(da);
 		
-		/* Mouse 이벤트 추가 */
-		everyuserList.addMouseListener(new MouseListener() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				if(!everyuserList.isSelectionEmpty()) {
-					String[] m = everyuserList.getSelectedValue().split(" : ");
-					selUser = m[0];
-				}
-			}
-			public void mousePressed(MouseEvent e) { }
-			public void mouseReleased(MouseEvent e) { }
-			public void mouseEntered(MouseEvent e) { }
-			public void mouseExited(MouseEvent e) { }
-			
+		/* Button 이벤트 리스너 추가 */
+		userBtn.addActionListener(new ActionListener() {
+		    @Override
+		    public void actionPerformed(ActionEvent e) {
+		        if (!userList.isSelectionEmpty()) {
+		            String[] m = userList.getSelectedValue().split(" : ");
+		            selUser = m[0];
+		        }
+		    }
 		});
-		
+
 		setSize(885, 660);
 		setResizable(false);
 		setLocationRelativeTo(null);
@@ -231,6 +228,45 @@ public class GameFrame extends JFrame{
 		repaint();
 	}
 	
+	/* GameFrame 클래스 내에 서버로부터 사용자 목록을 요청하는 메소드 추가 */
+	void requestUserList() {
+	    c.sendMsg(uroomTag + "//");
+	}
+	
+	/* 서버에서 받은 사용자 목록을 처리하는 메소드 */
+    void handleUserList(String userList) {
+        // userList를 파싱하여 배열로 만듭니다. 예시 코드이며 실제 데이터 형식에 맞게 수정 필요합니다.
+        String[] users = userList.split(",");
+
+        // 사용자 목록을 새로운 창에 표시
+        showRoomUsers(users);
+    }
+
+    /* 사용자 목록을 새로운 창에 표시하는 메소드 */
+    void showRoomUsers(String[] roomUsers) {
+        // JFrame 생성
+        JFrame userFrame = new JFrame("현재 방에 있는 사용자 목록");
+        userFrame.setSize(300, 200);
+        userFrame.setLocationRelativeTo(null);
+
+        // JPanel 생성
+        JPanel userPanel = new JPanel();
+        userPanel.setLayout(new BoxLayout(userPanel, BoxLayout.Y_AXIS));
+
+        // JLabel로 사용자 목록 추가
+        for (String user : roomUsers) {
+            JLabel userLabel = new JLabel(user);
+            userPanel.add(userLabel);
+        }
+
+        // JScrollPane으로 JPanel 감싸기
+        JScrollPane scrollPane = new JScrollPane(userPanel);
+        userFrame.add(scrollPane);
+
+        // JFrame 표시
+        userFrame.setVisible(true);
+    }
+	
 	/* Button 이벤트 리스너 */
 	class ButtonListener implements ActionListener{
 		@Override
@@ -246,8 +282,13 @@ public class GameFrame extends JFrame{
 //				}
 //			}
 			
+			/* 접속회원 모두보기 버튼 이벤트 */
+	        if (b.getText().equals("접속회원 모두보기")) {
+	            c.sendMsg(uroomTag + "//");
+	        }
+			
 			/* 기권하기 버튼 이벤트 */
-			if(b.getText().equals("기권하기")) {
+			else if (b.getText().equals("기권하기")) {
 				c.sendMsg(loseTag + "//");	//서버에 패배 태그 전송
 				dispose();					//인터페이스 닫음
 				c.mf.setVisible(true);
