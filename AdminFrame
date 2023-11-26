@@ -16,277 +16,239 @@ import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTextField;
 
 import omok.MainFrame.ButtonListener;
 
 public class AdminFrame extends JFrame{
-   /* Panel */
-   JPanel basePanel = new JPanel(new BorderLayout());
-   JPanel westPanel = new JPanel();  // 방목록
-   JPanel centerPanel = new JPanel();   // 가입 인원
-   JPanel eastPanel = new JPanel();    // 접속 인원
-   
-   /* Label */
-   JLabel roomListL = new JLabel("  ===== 방 목록 =====");
-   JLabel joinListL = new JLabel("  ===== 가입 인원 =====");
-   JLabel cuListL = new JLabel("  ===== 접속 인원 ====");
-   
-   /* ScrollPane */
-   JScrollPane rL_sp;
-   JScrollPane cL_sp;
-   JScrollPane jL_sp;
-   
-   /* List */
-   JList<String> rList = new JList<String>();
-   JList<String> cuList = new JList<String>();
-   JList<String> juList = new JList<String>();
-   
-   /* Button */
-   JButton exitRoom = new JButton("접속회원 강제퇴장");
-   JButton endRoom = new JButton("방 강제 종료");
-   JButton resetPw = new JButton("비밀번호 초기화");
-   JButton outGame = new JButton("회원 강제 탈퇴");
-   
-   String selRoom;      //선택된 방 제목
-   String roomName;   //생성할 방 제목
-   String pw;
-   
-   String selJoinUser;
-   String selUser;
-   
-   Client c = null;
-   
-   final String resetpwTag = "RESET";   //비밀번호 초기화
-   final String exitroomTag = "EXIT";   //강제 퇴장하기
-   final String endroomTag = "END";   //강제 종료하기
-   final String outgameTag = "OUT";   //강제 탈퇴하기
+	/* Panel */
+	JPanel basePanel = new JPanel(new BorderLayout());
+	JPanel westPanel = new JPanel();  // 방목록
+	JPanel centerPanel = new JPanel();	// 가입 인원
+	JPanel eastPanel = new JPanel(); 	// 접속 인원
+	
+	/* Label */
+	JLabel roomListL = new JLabel("  ===== 방 목록 =====");
+	JLabel joinListL = new JLabel("  ===== 가입 인원 =====");
+	JLabel cuListL = new JLabel("  ===== 접속 인원 ====");
+	
+	/* ScrollPane */
+	JScrollPane rL_sp;
+	JScrollPane cL_sp;
+	JScrollPane jL_sp;
+	
+	/* List */
+	JList<String> rList = new JList<String>();
+	JList<String> cuList = new JList<String>();
+	JList<String> juList = new JList<String>();
+		
+	/* Button */
+	JButton searchButton = new JButton("회원 검색하기");
+	JButton exitRoom = new JButton("접속회원 강제퇴장");
+	JButton endRoom = new JButton("방 강제 종료");
+	JButton ch_User = new JButton("회원모드로 변경");
+	
+	String selRoom;		//선택된 방 제목
+	String roomName;	//생성할 방 제목
+	String pw;
+	
+	String selJoinUser;
+	String selUser;
+	
+	Client c = null;
+	
+	final String viewUsersTag = "VIEWUSERS"; // 회원정보보기
+	final String exitroomTag = "EXIT";	//강제 퇴장하기
+	final String endroomTag = "END";	//강제 종료하기
+	final String userModeTag = "USERMODE" ;// 회원모드로 변경
 
-   public Object role;
-   
-    private JuListMouseListener juListMouseListener;
-    private CuListMouseListener cuListMouseListener;
-   
-   // 태그 넣기
-   
-   AdminFrame(Client _c) {
-      c = _c;
-            
-      setTitle("관리자 모드");   
-      
-      
-      /* Panel 크기 작업 */
-      westPanel.setPreferredSize(new Dimension(160, basePanel.getHeight()));
-      centerPanel.setPreferredSize(new Dimension(160, basePanel.getHeight()));
-      eastPanel.setPreferredSize(new Dimension(160, basePanel.getHeight()));
-      
-      
-      /* Label 크기 작업 */
-      roomListL.setPreferredSize(new Dimension(150, 20));
-      joinListL.setPreferredSize(new Dimension(150,20));
-      cuListL.setPreferredSize(new Dimension(150, 20));
-      
-      /* ScrollPane 크기 작업 */
-      rL_sp = new JScrollPane(rList);
-      jL_sp = new JScrollPane(juList);
-      cL_sp = new JScrollPane(cuList);
-      rL_sp.setPreferredSize(new Dimension(140, 370));
-      jL_sp.setPreferredSize(new Dimension(140, 370));
-      cL_sp.setPreferredSize(new Dimension(140, 208));
-      
-      /* Button 크기 작업 */
-      resetPw.setPreferredSize(new Dimension(140, 35));
-      exitRoom.setPreferredSize(new Dimension(140, 35));
-      endRoom.setPreferredSize(new Dimension(140, 35));
-      outGame.setPreferredSize(new Dimension(140, 35));
-      
-      setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+	public Object role;
+	
+	 private JuListMouseListener juListMouseListener;
+	 private CuListMouseListener cuListMouseListener;
+	
+	// 태그 넣기
+	
+	AdminFrame(Client _c) {
+		c = _c;
+		
+		setTitle("관리자 모드");
+		
+		
+		/* Panel 크기 작업 */
+		westPanel.setPreferredSize(new Dimension(160, basePanel.getHeight()));
+		centerPanel.setPreferredSize(new Dimension(160, basePanel.getHeight()));
+		eastPanel.setPreferredSize(new Dimension(160, basePanel.getHeight()));
+		
+		
+		/* Label 크기 작업 */
+		roomListL.setPreferredSize(new Dimension(150, 20));
+		joinListL.setPreferredSize(new Dimension(150,20));
+		cuListL.setPreferredSize(new Dimension(150, 20));
+		
+		/* ScrollPane 크기 작업 */
+		rL_sp = new JScrollPane(rList);
+		jL_sp = new JScrollPane(juList);
+		cL_sp = new JScrollPane(cuList);
+		rL_sp.setPreferredSize(new Dimension(140, 370));
+		jL_sp.setPreferredSize(new Dimension(140, 370));
+		cL_sp.setPreferredSize(new Dimension(140, 208));
+		
+		
+		/* Button 크기 작업 */
+		searchButton.setPreferredSize(new Dimension(140, 35));
+		exitRoom.setPreferredSize(new Dimension(140, 35));
+		endRoom.setPreferredSize(new Dimension(140, 35));
+		ch_User.setPreferredSize(new Dimension(140, 35));
+		
+		/* Panel 추가 작업 */
+		setContentPane(basePanel);	//panel을 기본 컨테이너로 설정
+		
+		basePanel.add(westPanel, BorderLayout.WEST);
+		basePanel.add(centerPanel, BorderLayout.CENTER);
+		basePanel.add(eastPanel, BorderLayout.EAST);
+		
+		westPanel.setLayout(new FlowLayout());
+		centerPanel.setLayout(new FlowLayout());
+		eastPanel.setLayout(new FlowLayout());
+		
+		westPanel.add(roomListL);
+		westPanel.add(rL_sp);
+		
+		centerPanel.add(joinListL);
+		centerPanel.add(jL_sp);
+		
+		/* eastPanel 컴포넌트 */
+		eastPanel.add(cuListL);
+		eastPanel.add(cL_sp);
+        eastPanel.add(searchButton);
+		eastPanel.add(exitRoom);
+		eastPanel.add(endRoom);
+		eastPanel.add(ch_User);
+		
+		/* Button 이벤트 리스너 추가 */
+		ButtonListener bl = new ButtonListener();
+		
+		searchButton.addActionListener(bl);
+		exitRoom.addActionListener(bl);
+		endRoom.addActionListener(bl);
+		ch_User.addActionListener(bl);
+		
+		/* Mouse 이벤트 추가 */
+		rList.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if(!rList.isSelectionEmpty()) {
+					String[] m = rList.getSelectedValue().split(" : ");
+					selRoom = m[0];
+				}
+			}
+	
+		});
+		
+		juListMouseListener = new JuListMouseListener();
+		juList.addMouseListener(juListMouseListener);
 
-      // 창 닫기 버튼 이벤트 처리
-      addWindowListener(new java.awt.event.WindowAdapter() {
-          @Override
-          public void windowClosing(java.awt.event.WindowEvent windowEvent) {
-              int result = JOptionPane.showConfirmDialog(
-                      null, "관리자 모드를 종료하시겠습니까?", "종료 확인", JOptionPane.YES_NO_OPTION);
-
-              if (result == JOptionPane.YES_OPTION) {
-                  // 여기에 추가로 수행할 작업이 있다면 처리
-            	  dispose();  // 창을 닫습니다.
-              }
-              // 사용자가 '아니오'를 선택한 경우는 그냥 창을 닫지 않고 유지합니다.
-          }
-      });
-      
-      /* Panel 추가 작업 */
-      setContentPane(basePanel);   //panel을 기본 컨테이너로 설정
-      
-      basePanel.add(westPanel, BorderLayout.WEST);
-      basePanel.add(centerPanel, BorderLayout.CENTER);
-      basePanel.add(eastPanel, BorderLayout.EAST);
-      
-      westPanel.setLayout(new FlowLayout());
-      centerPanel.setLayout(new FlowLayout());
-      eastPanel.setLayout(new FlowLayout());
-      
-      westPanel.add(roomListL);
-      westPanel.add(rL_sp);
-      
-      centerPanel.add(joinListL);
-      centerPanel.add(jL_sp);
-      
-      /* eastPanel 컴포넌트 */
-      eastPanel.add(cuListL);
-      eastPanel.add(cL_sp);
-      eastPanel.add(exitRoom);
-      eastPanel.add(endRoom);
-      eastPanel.add(resetPw);
-      eastPanel.add(outGame);
-      
-      /* Button 이벤트 리스너 추가 */
-      ButtonListener bl = new ButtonListener();
-      
-      resetPw.addActionListener(bl);
-      exitRoom.addActionListener(bl);
-      endRoom.addActionListener(bl);
-      outGame.addActionListener(bl);
-      
-      /* Mouse 이벤트 추가 */
-      rList.addMouseListener(new MouseAdapter() {
-         @Override
-         public void mouseClicked(MouseEvent e) {
-            if(!rList.isSelectionEmpty()) {
-               String[] m = rList.getSelectedValue().split(" : ");
-               selRoom = m[0];
-            }
-         }
-   
-      });
-      
-      juListMouseListener = new JuListMouseListener();
-      juList.addMouseListener(juListMouseListener);
-
-      cuListMouseListener = new CuListMouseListener();
-       cuList.addMouseListener(cuListMouseListener);
-      
-      setSize(510, 450);
-      setLocationRelativeTo(null);
-      setResizable(false);
-   }
-   
-   // 가입인원 선택 
-   private class CuListMouseListener extends MouseAdapter {
-      
+		cuListMouseListener = new CuListMouseListener();
+	    cuList.addMouseListener(cuListMouseListener);
+		
+		setSize(510, 450);
+		setDefaultCloseOperation(EXIT_ON_CLOSE);
+		setLocationRelativeTo(null);
+		setResizable(false);
+	}
+	
+	// 가입인원 선택 
+	private class CuListMouseListener extends MouseAdapter {
+		
         @Override
         public void mouseClicked(MouseEvent e) {
             if (!cuList.isSelectionEmpty()) {
                 String m = cuList.getSelectedValue();
                 selUser = m;
-                juList.removeMouseListener(juListMouseListener);   // 가입인원 리스너 해제
+                juList.removeMouseListener(juListMouseListener);	// 가입인원 리스너 해제
                 juList.clearSelection(); // 가입인원 클릭 해제 
                 
                 // 마우스 리스터 다시 등록
-                juList.addMouseListener(   juListMouseListener );
+                juList.addMouseListener(	juListMouseListener );
            
             }
         }
     }
-   
-   // 접속 인원  선택 
-      private class JuListMouseListener extends MouseAdapter {
-           @Override
-           public void mouseClicked(MouseEvent e) {
-               if (!juList.isSelectionEmpty()) {
-                   String m = juList.getSelectedValue();
-                   selUser = m;
-                   cuList.removeMouseListener(cuListMouseListener);   // 접속인원 리스너 해제
-                   cuList.clearSelection(); // 접속인원 클릭 해제
-                   
-                   // 마우스 리스너 다시 등록
-                   cuList.addMouseListener(cuListMouseListener);
-                   
-               }
-           }
-       }
-   
-   /* Button 이벤트 리스너 */
-   class ButtonListener implements ActionListener{
-      @Override
-      public void actionPerformed(ActionEvent e) {
-         JButton b = (JButton)e.getSource();
-         
-         /* 비밀번호 초기화 버튼 이벤트 */
-         if(b.getText().equals("비밀번호 초기화")) {
-            String userNick = "";
-            if (selUser != null) {
-               userNick = selUser;
+	
+	// 접속 인원  선택 
+		private class JuListMouseListener extends MouseAdapter {
+	        @Override
+	        public void mouseClicked(MouseEvent e) {
+	            if (!juList.isSelectionEmpty()) {
+	                String m = juList.getSelectedValue();
+	                selUser = m;
+	                cuList.removeMouseListener(cuListMouseListener);	// 접속인원 리스너 해제
+	                cuList.clearSelection(); // 접속인원 클릭 해제
+	                
+	                // 마우스 리스너 다시 등록
+	                cuList.addMouseListener(cuListMouseListener);
+	                
+	            }
+	        }
+	    }
+	
+	/* Button 이벤트 리스너 */
+	class ButtonListener implements ActionListener{
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			JButton b = (JButton)e.getSource();
+			
+			// "회원 조회" 버튼 클릭 시
+            if (b.getText().equals("회원 검색하기")) {
+                String searchName = JOptionPane.showInputDialog(null, "회원 이름을 입력하세요:", "회원 검색하기", JOptionPane.PLAIN_MESSAGE);
+                if (searchName != null && !searchName.isEmpty()) {
+                    // 검색한 이름으로 회원 정보 조회 요청
+                    c.sendMsg(viewUsersTag + "//" + searchName);
+                    System.out.println("[Client_admin] 회원정보 조회 시도 ");
+                } else {
+                    JOptionPane.showMessageDialog(null, "이름을 입력해주세요.", "회원 조회", JOptionPane.ERROR_MESSAGE);
+                    System.out.println("[Client_admin] 회원 정보 조회 시도 실패");
+                }
             }
-            if(!userNick.isEmpty()) {
-               int result = JOptionPane.showConfirmDialog(null,userNick+"님의\n 비밀번호를 초기화할까요?","비밀번호 초기화",
-                     +JOptionPane.YES_NO_OPTION,JOptionPane.QUESTION_MESSAGE);
-               if(result == JOptionPane.NO_OPTION){
-                  JOptionPane.showMessageDialog(null, "취소합니다.");
-               }else {
-               
-                  System.out.println("[Client_admin] 비밀번호 초기화 시도 ");
-                  c.sendMsg(resetpwTag + "//password//" + userNick);
-               }
-            }
-            else {
-               JOptionPane.showMessageDialog(null, "사용자를 선택해주세요.","비밀번호 포기화-사용자선택",JOptionPane.ERROR_MESSAGE);
-            }
-         }
-         
-         /* 강제 퇴장하기 버튼 이벤트 */
-         else if(b.getText().equals("접속회원 강제퇴장")) {
-            
-            if(selRoom != null ) {   
-               c.sendMsg(exitroomTag + "//" + selRoom);
-            } else {         
-               JOptionPane.showMessageDialog(null, "퇴장할 방을 선택해주세요.", "방 강제퇴장", JOptionPane.ERROR_MESSAGE);
-               System.out.println("[Client_admin]  '강제퇴장' 입력 값이 존재하지 않음");
-            }
-         } 
-         
-         /* 강제 종료하기 버튼 이벤트 */
-         else if(b.getText().equals("방 강제 종료")) {
-            if(selRoom != null) {
-               int result = JOptionPane.showConfirmDialog(null, selRoom+"방을 강제종료 할까요?","방 강제종료",
-                                             JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE);
-               
-               if(result == JOptionPane.NO_OPTION){
-                  JOptionPane.showMessageDialog(null, "취소합니다.");
-               }
-               else {
-               c.sendMsg(endroomTag +"//" + selRoom);
-               }
-            }
-            else {
-               JOptionPane.showMessageDialog(null, "종료할 방을 선택해주세요.","방 강제종료",JOptionPane.ERROR_MESSAGE);
-               System.out.println("[Client_admin] '강제종료' 입력 값이 존재하지 않음'");
-            }
-         }
-         
-         /* 강제 탈퇴하기 버튼 이벤트*/  
-         else if(b.getText().equals("회원 강제 탈퇴")) {
-               String userNick = "";
-               if (selUser != null) {
-                  userNick = selUser;
-               }
-                 if (!userNick.isEmpty()) {
-                  int result = JOptionPane.showConfirmDialog(null, userNick+"님 탈퇴를 진행할까요?","강제 탈퇴",JOptionPane.YES_NO_OPTION,JOptionPane.WARNING_MESSAGE);
-                  if(result == JOptionPane.NO_OPTION){
-                     JOptionPane.showMessageDialog(null, "취소합니다.");
-                  }else {
-                     System.out.println("[Client_admin] '회원 강제 탈퇴 시도 ");
-                     c.sendMsg(outgameTag+"//"+userNick);                  
-                  }
-               }
-               else {
-                  JOptionPane.showMessageDialog(null, "탈퇴시킬 유저를 선택해주세요.","강제탈퇴",JOptionPane.ERROR_MESSAGE);
-                  System.out.println("[Client_admin] '강제탈퇴' 입력 값이 존재하지 않음'");
-               }
-
-         } 
-         
-      }
-   }
+			
+			/* 강제 퇴장하기 버튼 이벤트 */
+			else if(b.getText().equals("접속회원 강제퇴장")) {
+				
+				if(selRoom != null ) {	
+					c.sendMsg(exitroomTag + "//" + selRoom);
+				} else {			
+					JOptionPane.showMessageDialog(null, "퇴장할 방을 선택해주세요.", "방 강제퇴장", JOptionPane.ERROR_MESSAGE);
+					System.out.println("[Client_admin]  '강제퇴장' 입력 값이 존재하지 않음");
+				}
+			} 
+			
+			/* 강제 종료하기 버튼 이벤트 */
+			else if(b.getText().equals("방 강제 종료")) {
+				if(selRoom != null) {
+					int result = JOptionPane.showConfirmDialog(null, selRoom+"방을 강제종료 할까요?","방 강제종료",
+															JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE);
+					
+					if(result == JOptionPane.NO_OPTION){
+						JOptionPane.showMessageDialog(null, "취소합니다.");
+					}
+					else {
+					c.sendMsg(endroomTag +"//" + selRoom);
+					}
+				}
+				else {
+					JOptionPane.showMessageDialog(null, "종료할 방을 선택해주세요.","방 강제종료",JOptionPane.ERROR_MESSAGE);
+					System.out.println("[Client_admin] '강제종료' 입력 값이 존재하지 않음'");
+				}
+			}
+			
+			/* 회원모드로 변경 버튼 이벤트 */
+			else if (b.getText().equals("회원모드로 변경")) {
+				JOptionPane.showMessageDialog(null, "회원모드로 변경합니다.","관리자 모드 변경",JOptionPane.INFORMATION_MESSAGE);
+				c.mf.setVisible(true);
+				c.af.dispose();
+			}
+			
+		}
+	}
 }
