@@ -2,6 +2,7 @@ package omok;
 
 import java.net.*;
 import java.sql.Connection;
+import java.util.Arrays;
 import java.awt.Image;
 import java.io.*;
 import javax.swing.*;
@@ -24,6 +25,7 @@ public class Client {
 	GameFrame gf = null;
 	SRankFrame srf = null;
 	AdminFrame af = null;
+	AdminInfoFrame aif = null;
 	
 	ImageIcon imgicon = null;
 	
@@ -48,7 +50,7 @@ public class Client {
 			client.gf = new GameFrame(client);
 			client.srf = new SRankFrame(client);
 			client.af = new AdminFrame(client);
-			
+			client.aif = new AdminInfoFrame(client);
 			MessageListener msgListener = new MessageListener(client, client.mySocket);
 			msgListener.start();	//스레드 시작
 		} catch(SocketException e) {
@@ -114,6 +116,8 @@ class MessageListener extends Thread{
 	//================ 관리자 모드 ===================//
 	final String adminTag = "ADMIN"; 	//관리자 접근
 	final String juserTag = "JUSER";	//회원가입된 모든 유저
+	final String viewUsersTag = "VIEWUSERS"; // 회원정보보기
+	final String updateUserTag = "UPDATE"; // 회원 정보 수정
 	final String resetpwTag = "RESET";	//비밀번호 초기화
 	final String exitroomTag = "EXIT";	//강제 퇴장하기
 	final String exitroomUserTag = "EXITUSER"; //강제 퇴장 유저선택
@@ -122,6 +126,8 @@ class MessageListener extends Thread{
 	final String endroomTag = "END";	//강제 종료하기
 	final String endroomUserTag = "ENDUSER"; 	// 강제종료 회원
 	final String outgameTag = "OUT";	//강제 탈퇴하기
+	final String userModeTag = "USERMODE" ;// 회원모드로 변경
+
 	
 	MessageListener(Client _c, Socket _s) {
 		this.client = _c;
@@ -142,7 +148,7 @@ class MessageListener extends Thread{
 				
 				/* 로그인 */
 				if(m[0].equals(loginTag)) {
-					loginCheck(m[1]);
+					loginCheck(m[1],m[2]);
 				}
 				
 				/* 회원가입 */
@@ -268,6 +274,14 @@ class MessageListener extends Thread{
 					joinUser(m[1]);
 				}
 				
+				/* 회원 정보 검색 조회 */
+				else if(m[0].equals(viewUsersTag)) {
+					viewUsers(m[1]);
+				}
+				
+				else if(m[0].equals(updateUserTag)) {
+					updateUser(m[1]);
+				}
 				/* 관리자 - 비밀번호 초기화 */
 				else if(m[0].equals(resetpwTag)) {
 					resetPw(m[1]);
@@ -297,7 +311,7 @@ class MessageListener extends Thread{
 				else if(m[0].equals(endroomTag)) {
 					endRoom(m[1]);
 				}
-				
+				 
 				else if(m[0].equals(endroomUserTag)) {
 					endRoomUser(m[1]);
 				}
@@ -314,11 +328,36 @@ class MessageListener extends Thread{
 	}
 	
 	/* 로그인 성공 여부를 확인하는 메소드 */
-	void loginCheck(String _m) {	
+	void loginCheck(String _m,String _r) {	
 		if(_m.equals("OKAY")) {	//로그인 성공
+			if(_r.equals("ADMIN")) {
+				// 관리자모드 vs 회원모드 
+				String[] roles = {"회원모드","관리자모드"};
+				Object selected = JOptionPane.showOptionDialog(null, 
+																	"모드를 선택해주세요",
+																	"관리자 전용",
+																	JOptionPane.YES_NO_OPTION,
+																	JOptionPane.QUESTION_MESSAGE,
+																	null,
+																	roles,
+																	roles[1]);
+				if(selected.equals("회원모드")) {
+					client.mf.setVisible(true);				
+					client.lf.dispose();
+				}
+				else {
+					client.af.setVisible(true);
+					client.lf.dispose();
+				}
+
+			}
+			// 일반 회원 일시 
+			else {
+				client.mf.setVisible(true);				
+				client.lf.dispose();
+			}
 			System.out.println("[Client] 로그인 성공 : 메인 인터페이스 열림 : 로그인 인터페이스 종료");
-			client.mf.setVisible(true);
-			client.lf.dispose();
+			
 		}
 		
 		else {				//로그인 실패
@@ -538,7 +577,7 @@ class MessageListener extends Thread{
 	void roomUser(String _m) {
 		if(!_m.equals("")) {
 			String[] user = _m.split("@");
-			client.gf.everyuserList.setListData(user);
+			client.gf.userList.setListData(user);
 		}
 	}
 	
@@ -641,6 +680,64 @@ class MessageListener extends Thread{
 		} else {
 			System.out.println("[Client_admin] 가입된 회원 목록 조회 실패");
 		}
+	}
+	
+	/* 특정 회원 정보 검색하는 메소드 */
+	void viewUsers(String _m) {
+		if(!_m.equals("FAIL")) {
+			System.out.println("[Client_admin] 회원 정보 조회 성공");
+			String[] u =  _m.split("@@");
+			System.out.println(Arrays.toString(u));
+			if(u[0].equals("USER")) {
+				client.aif.user.setSelected(true);
+			}else {
+				client.aif.admin.setSelected(true);
+			}
+			
+			ImageIcon originalImageIcon = new ImageIcon(u[1]);
+		
+			  // 이미지 아이콘을 레이블 크기에 맞게 조절
+	        Image originalImage = originalImageIcon.getImage();
+	        Image scaledImage = originalImage.getScaledInstance(150, 180, Image.SCALE_SMOOTH);
+	        ImageIcon  scaledImageIcon = new ImageIcon(scaledImage);
+	        client.aif.proImgL.setIcon(scaledImageIcon);
+		
+			client.aif.nickname.setText(u[2]);
+			client.aif.name.setText(u[3]);
+			client.aif.id.setText(u[4]);
+			client.aif.email.setText(u[5]);
+			client.aif.phone.setText(u[6]);
+			client.aif.gender.setText(u[7]);
+			client.aif.birth_year.setText(u[8]);
+			client.aif.birth_month.setText(u[9]);
+			client.aif.birth_day.setText(u[10]);
+			client.aif.post.setText(u[11]);
+			client.aif.road.setText(u[12]);
+			client.aif.detail.setText(u[13]);
+			client.aif.win.setText(u[14]);
+			client.aif.lose.setText(u[15]);
+			
+			client.aif.o_nickname = u[2];
+			client.aif.setVisible(true);
+		}
+		else {
+			System.out.println("[Client_admin] 회원 정보 조회 검색 실패");
+		}
+	}
+	
+	/* 회원정보 수정하여 저장하는 메소드 */
+	void updateUser(String _m) {
+		if(_m.equals("OKAY")) {
+			System.out.println("[Client_admin] 회원 정보 수정 성공");
+			JOptionPane.showMessageDialog(null, "정상적으로 수정되었습니다", "회원 정보 수정", JOptionPane.INFORMATION_MESSAGE);
+			
+		}
+		else {
+			System.out.println("[Client_admin] 회원 정보 수정 실패");
+			JOptionPane.showMessageDialog(null, "정보 수정에 실패하였습니다.", "회원 정보 수정", JOptionPane.ERROR_MESSAGE);
+			
+		}
+		
 	}
 	
 	/* 비밀번호 초기화하는 메소드 */
@@ -752,6 +849,8 @@ class MessageListener extends Thread{
 		if(_m.equals("OKAY")) {
 			System.out.println("[Client_admin] 회원 강제탈퇴 성공");
 			JOptionPane.showMessageDialog(null, "성공적으로 탈퇴했습니다.","회원 탈퇴",JOptionPane.INFORMATION_MESSAGE);
+			client.aif.setVisible(false);
+			client.aif.dispose();
 			client.sendMsg(juserTag+"//");		// 강제 탈퇴후 리스트 업데이트
 		}else {
 			System.out.println("[Client_admin] 회원 강제탈퇴 실패");
