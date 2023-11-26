@@ -102,7 +102,8 @@ class CCUser extends Thread{
 	//================ 관리자 모드 ===================//
 	final String adminTag = "ADMIN";  	//관리자 모드 접근
 	final String juserTag = "JUSER"; // 회원가입된 모든유저
-	final String searchuserTag = "SEARCHUSER";	//회원 조회하기
+	final String viewUsersTag = "VIEWUSERS"; // 회원정보보기
+	final String updateUserTag = "UPDATE"; // 회원 정보 수정
 	final String resetpwTag = "RESET";	//비밀번호 초기화
 	final String exitroomTag = "EXIT";	//강제 퇴장하기
 	final String exitroomUserTag = "EXITUSER";  // 강제 퇴장 회원 선택 
@@ -111,6 +112,8 @@ class CCUser extends Thread{
 	final String endroomTag = "END";	//강제 종료하기
 	final String endroomUserTag = "ENDUSER"; 	// 강제종료 회원
 	final String outgameTag = "OUT";	//강제 탈퇴하기
+	final String userModeTag = "USERMODE" ;// 회원모드로 변경
+
 	
 	CCUser(Socket _s, Server _ss) {
 		this.socket = _s;
@@ -140,15 +143,17 @@ class CCUser extends Thread{
 				
 				/* 로그인 */
 				if(m[0].equals(loginTag)) {
-					String mm = db.loginCheck(m[1], m[2]);
+					String[] mm = (db.loginCheck(m[1], m[2])).split("//");
+					String nn = mm[0];
+					String role = mm[1];
 					
-					if(!mm.equals("null")) {	//로그인 성공
-						nickname = mm;		//로그인한 사용자의 닉네임을 필드에 저장
+					if(!nn.equals("null")) {	//로그인 성공
+						nickname = nn;		//로그인한 사용자의 닉네임을 필드에 저장
 						
 						auser.add(this);	//모든 접속 인원에 추가
 						wuser.add(this);	//대기실 접속 인원에 추가
 						
-						dos.writeUTF(loginTag + "//OKAY");
+						dos.writeUTF(loginTag + "//OKAY//"+role);
 						
 						sendWait(connectedUser());	//대기실 접속 유저에 모든 접속 인원을 전송
 						
@@ -159,7 +164,7 @@ class CCUser extends Thread{
 					}
 					
 					else {	//로그인 실패
-						dos.writeUTF(loginTag + "//FAIL");
+						dos.writeUTF(loginTag + "//FAIL//"+" ");
 					}
 				}
 				
@@ -183,8 +188,8 @@ class CCUser extends Thread{
 				
 				/* 회원가입 */
 				else if(m[0].equals(joinTag)) {
-			
-					if(db.joinCheck(m[1], m[2], m[3], m[4], m[5], m[6], m[7], m[8],m[9], m[10], m[11], m[12], m[13], m[14], m[15], m[16], _img, imgPath)) {	//회원가입 성공
+				
+					if(db.joinCheck(m[1], m[2], m[3], m[4], m[5], m[6], m[7], m[8],m[9], m[10], m[11], m[12], m[13], m[14], _img, imgPath)) {	//회원가입 성공
 						dos.writeUTF(joinTag + "//OKAY");
 					}
 					
@@ -510,7 +515,26 @@ class CCUser extends Thread{
 					}
 					
 				}
-	
+				/* 회원 정보 조회 - 검색 */
+				else if(m[0].equals(viewUsersTag)) {
+					if(!db.viewUsers(m[1]).equals("null")) {
+						dos.writeUTF(viewUsersTag + "//"+ db.viewUsers(m[1]));
+					}
+					else { // 회원 정보 조회 실패
+						dos.writeUTF(viewUsersTag + "//FAIL");
+					}
+				}
+				
+				/* 회원 정보 수정 */
+				else if(m[0].equals(updateUserTag)) {
+					if(db.updateUserInfo(m[1], m[2], m[3], m[4], m[5], m[6], m[7], m[8], m[9], m[10], m[11], m[12], m[13], m[14], m[15], m[16])) {
+						dos.writeUTF(updateUserTag + "//OKAY");
+					}
+					else {
+						dos.writeUTF(updateUserTag + "//FAIL");
+					}
+				}
+				
 				/* 비밀번호 초기화 - 관리자 권한 */
 				else if(m[0].equals(resetpwTag)) {
 					if(db.resetPw( m[1],m[2])) {	//변경 성공
