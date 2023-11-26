@@ -27,7 +27,7 @@ public class MainFrame extends JFrame{
 	JMenuBar mb = new JMenuBar();
 	JMenu infoMenu = new JMenu("내정보");
 	JMenu AdminMenu = new JMenu("관리자");
-	JMenuItem	viewInfo = new JMenuItem("내 정보 보기");
+	JMenuItem viewInfo = new JMenuItem("내 정보 보기");
 	JMenuItem changeInfo = new JMenuItem("내 정보 바꾸기");
 	JMenuItem viewRole = new JMenuItem("관리자 모드");
 	
