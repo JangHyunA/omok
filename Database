@@ -32,20 +32,20 @@ public class Database {
 	//로그인 여부를 확인하는 메소드. 서버에 닉네임을 String 형식으로 반환한다.
 	String loginCheck(String _i, String _p) {
 		String nickname = "null";	//반환할 닉네임 변수를 "null"로 초기화.
-		
+		String role = "null";
 		//매개변수로 받은 id와 password값을 id와 pw값에 초기화한다.
 		String id = _i;
 		String pw = _p;
 		
 		try {
 			//id와 일치하는 비밀번호와 닉네임이 있는지 조회한다.
-			String checkingStr = "SELECT password, nickname FROM member WHERE id='" + id + "'";
+			String checkingStr = "SELECT password, nickname,role FROM member WHERE id='" + id + "'";
 			ResultSet result = stmt.executeQuery(checkingStr);
-			
 			int count = 0;
 			while(result.next()) {
 				//조회한 비밀번호와 pw 값을 비교.
 				if(pw.equals(result.getString("password"))) {	//true일 경우 nickname에 조회한 닉네임에 반환하고 로그인 성공을 콘솔로 알린다.
+					role = result.getString("role");
 					nickname = result.getString("nickname");
 					System.out.println("[Server] 로그인 성공");
 				}
@@ -61,11 +61,11 @@ public class Database {
 			System.out.println("[Server] 로그인 실패 > " + e.toString());
 		}
 		
-		return nickname;	//nickname 반환
+		return nickname+"//"+role;	//nickname 반환
 	}
 	
 	//회원가입을 수행하는 메소드. 회원가입에 성공하면 true, 실패하면 false를 반환한다.
-	boolean joinCheck(String _n, String _nn, String _i, String _p, String _g, String _y, String _m, String _day, String _ph, String _p1, String _p2, String _e, String _o, String _r, String _d, String _role, FileInputStream _img, String _imgP) {
+	boolean  joinCheck(String _n, String _nn, String _i, String _p, String _g, String _y, String _m, String _day, String _ph, String _e, String _o, String _r, String _d, String _role, FileInputStream _img, String _imgP) {
 		boolean flag = false;	//참거짓을 반환할 flag 변수. 초기값은 false
 		
 		//매개변수로 받은 각 문자열들을 각 변수에 초기화한다.
@@ -78,8 +78,6 @@ public class Database {
 		String month = _m;
 		String day = _day;
 		String ph = _ph;
-		String p1 = _p1;
-		String p2 = _p2;
 		String em = _e;
 		String po = _o;
 		String ro = _r;
@@ -91,7 +89,7 @@ public class Database {
 		try {
 			//member 테이블에 각 문자열들을 순서대로 업데이트하는 문장. 승, 패는 초기값을 숫자 0으로 한다.
 			if ( role.equals("일반회원")) {
-				PreparedStatement pre = con.prepareStatement("INSERT INTO member(name, nickname, id, password, gender, year, month, day, phone, phone1, phone2, email, post, road, detail, img, imgpath, role, win, lose) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+				PreparedStatement pre = con.prepareStatement("INSERT INTO member(name, nickname, id, password, gender, year, month, day, phone, email, post, road, detail, img, imgpath, role, win, lose) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 				
 				pre.setString(1, na);
 				pre.setString(2, nn);
@@ -102,22 +100,20 @@ public class Database {
 				pre.setString(7, month);
 				pre.setString(8, day);
 				pre.setString(9, ph);
-				pre.setString(10, p1);
-				pre.setString(11, p2);
-				pre.setString(12, em);
-				pre.setString(13, po);
-				pre.setString(14, ro);
-				pre.setString(15, de);
-				pre.setBinaryStream(16, _img);
-				pre.setString(17, imgP);
-				pre.setString(18, "USER");
-				pre.setInt(19, 0);
-				pre.setInt(20, 0);
+				pre.setString(10, em);
+				pre.setString(11, po);
+				pre.setString(12, ro);
+				pre.setString(13, de);
+				pre.setBinaryStream(14, _img);
+				pre.setString(15, imgP);
+				pre.setString(16, "USER");
+				pre.setInt(17, 0);
+				pre.setInt(18, 0);
 				pre.executeUpdate();
 				pre.close();
 				
 			}else if(role.equals("관리자")){ 	// 관리자 
-				PreparedStatement pre = con.prepareStatement("INSERT INTO member(name, nickname, id, password, gender, year, month, day, phone, phone1, phone2, email, post, road, detail, img, imgpath, role, win, lose, admin_code) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+				PreparedStatement pre = con.prepareStatement("INSERT INTO member(name, nickname, id, password, gender, year, month, day, phone, email, post, road, detail, img, imgpath, role, win, lose, admin_code) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 			
 				pre.setString(1, na);
 				pre.setString(2, nn);
@@ -128,18 +124,16 @@ public class Database {
 				pre.setString(7, month);
 				pre.setString(8, day);
 				pre.setString(9, ph);
-				pre.setString(10, p1);
-				pre.setString(11, p2);
-				pre.setString(12, em);
-				pre.setString(13, po);
-				pre.setString(14, ro);
-				pre.setString(15, de);
-				pre.setBinaryStream(16, _img);
-				pre.setString(17, imgP);
-				pre.setString(18, "ADMIN");
-				pre.setInt(19, 0);
-				pre.setInt(20, 0);
-				pre.setString(21,"admin1234");
+				pre.setString(10, em);
+				pre.setString(11, po);
+				pre.setString(12, ro);
+				pre.setString(13, de);
+				pre.setBinaryStream(14, _img);
+				pre.setString(15, imgP);
+				pre.setString(16, "ADMIN");
+				pre.setInt(17, 0);
+				pre.setInt(18, 0);
+				pre.setString(19,"admin1234");
 				pre.executeUpdate();
 				pre.close();
 			}
@@ -150,7 +144,7 @@ public class Database {
 			System.out.println("[Server] 회원가입 실패 > " + e.toString());
 		}
 		
-		return flag;	//flag 반환
+		return flag; 	 //flag + role 반환
 	}
 	
 	//아이디나 닉네임이 중복되었는지 확인해주는 메소드. 중복 값이 존재하면 false, 존재하지 않으면 true를 반환한다.
@@ -422,7 +416,7 @@ public class Database {
 		return name;
 	}
 	
-	
+	/* 가입된 회원 불러오기 */
 	String joinUser() {
 		String msg = "";
 		try {
@@ -441,6 +435,74 @@ public class Database {
 		return msg;
 	}
 
+	/* 회원 정보 검색 */
+	String viewUsers(String _n) {
+		String nick = _n;
+		String msg ="null";
+		try {
+			String viewStr = "SELECT * FROM member WHERE nickname = '"+nick+"'";
+			ResultSet result = stmt.executeQuery(viewStr);
+			
+			while(result.next()) {
+				msg =result.getString("role") + "@@" + result.getString("imgpath") +  "@@" +
+						result.getString("nickname") + "@@" +result.getString("name") + "@@" + result.getString("id") + "@@" +
+						result.getString("email") + "@@" + result.getString("phone") + "@@" + result.getString("gender") +"@@"+
+						result.getString("year") +  "@@" +result.getString("month")+ "@@" + result.getString("day") + "@@" +
+						result.getString("post") + "@@" + result.getString("road") + "@@" + result.getString("detail") +  "@@" +
+						result.getString("win") + "@@" + result.getString("lose");
+			}
+			System.out.println("[Server] 회원 정보 조회 검색 성공");
+		
+		}catch (Exception e) {
+			System.out.println("[Server] 회원 정보 조회 검색 실패 > "+ e.toString());
+			msg = "null";
+		}
+		return msg;
+	}
+	
+	boolean updateUserInfo( String _on, String _role, String _n, String _nn, String _i, String _g, String _y, String _m, String _day, String _p, String _po, String _r, String _d, String _e, String _w, String _l) {
+		boolean flag = false;
+		String origin_nick = _on;
+		
+		String name = _n;
+		String nickname = _nn;
+		String id = _i;
+		String email = _e;
+		String phone = _p;
+		String gender = _g;
+		String year = _y;
+		String month = _m;
+		String day = _day;
+		String post = _po;
+		String road = _r;
+		String detail = _d;
+		String win = _w;
+		String lose = _l;
+		
+		String role = _role;
+		try {
+			if (role.equals("USER")) {
+				String updateStr = "UPDATE member SET name = '"+name+"' ,nickname = '"+nickname+"' , id = '"+id+"' , gender = '"+gender +
+						"' , year = '"+year +"' , month = '"+ month +"' , day = '"+day +"' , phone = '"+ phone +"' , post = '" + post  +"' , road = '"+ road +
+						"' , detail = '" + detail + "' , email = '"+ email +"' , role = '"+ role+  "' , win = '" + win +"' , lose = '"+ lose  +"', admin_code = '"+" "+"' WHERE nickname = '" + origin_nick+"'";
+				System.out.println(updateStr);
+				stmt.executeUpdate(updateStr);
+			}
+			else {
+					String updateStr = "UPDATE member SET name = '"+name+"' ,nickname = '"+nickname+"' , id = '"+id+"' , gender = '"+gender +
+							"' , year = '"+year +"' , month = '"+ month +"' , day = '"+day +"' , phone = '"+ phone +"' , post = '" + post  +"' , road = '"+ road +
+							"' , detail = '" + detail + "' , email = '"+ email +"' , role = '"+ role+ "' , win = '" + win +"' , lose = '"+ lose +"', admin_code = '"+"admin1234"+"' WHERE nickname = '" + origin_nick + "'";
+					System.out.println(updateStr);
+					stmt.executeUpdate(updateStr);
+			}
+			 flag = true;
+			 System.out.println("[Server] 회원 정보 업데이트 성공 ");
+		}catch ( Exception e ) {
+				flag = false;
+				System.out.println("[Server] 회원 정보 업데이트 실패 ");
+		}		
+		return flag;
+	}
 	
 	//비밀번호를 초기화하는 메소드. 변경에 성공하면 true, 실패하면 false를 반환한다.
 	boolean resetPw(String _a, String _nn) {
