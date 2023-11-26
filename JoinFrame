@@ -47,7 +47,7 @@ public class JoinFrame extends JFrame{
 	   JLabel postL = new JLabel("우편번호");
        JLabel roadL = new JLabel("도로명주소");
        JLabel detailL = new JLabel("상세주소");
-       JLabel proImgL = new JLabel("프로필 이미지 넣는 곳");
+       JLabel proImgL = new JLabel();
        
        
        /* TextField */
@@ -125,7 +125,7 @@ public class JoinFrame extends JFrame{
          pwConfirm.setPreferredSize(new Dimension(185, 30));
          phone1.setPreferredSize(new Dimension(80, 30));
          phone2.setPreferredSize(new Dimension(80, 30));
-         email.setPreferredSize(new Dimension(150, 30));
+         email.setPreferredSize(new Dimension(140, 30));
          post.setPreferredSize(new Dimension(185, 30));
          road.setPreferredSize(new Dimension(250, 30));
          detail.setPreferredSize(new Dimension(250, 30));
@@ -300,20 +300,20 @@ public class JoinFrame extends JFrame{
         });
         
         /* 비밀번호 강도 표시기 이벤트 리스너 */
-          pw.getDocument().addDocumentListener(new DocumentListener() {
-              @Override
-              public void insertUpdate(DocumentEvent e) {
-                  updateStrengthIndicator();
-              }
-              @Override
-              public void removeUpdate(DocumentEvent e) {
-                  updateStrengthIndicator();
-              }
-              @Override
-              public void changedUpdate(DocumentEvent e) {
-                  updateStrengthIndicator();
-              }
-          });
+	    pw.getDocument().addDocumentListener(new DocumentListener() {
+	          @Override
+	          public void insertUpdate(DocumentEvent e) {
+	              updateStrengthIndicator();
+	          }
+	          @Override
+	          public void removeUpdate(DocumentEvent e) {
+	              updateStrengthIndicator();
+	          }
+	          @Override
+	          public void changedUpdate(DocumentEvent e) {
+	              updateStrengthIndicator();
+	          }
+	     });
           
           checkPwBtn.addActionListener(new ActionListener() {
               @Override
@@ -326,6 +326,32 @@ public class JoinFrame extends JFrame{
                   } else {
                       JOptionPane.showMessageDialog(null, "비밀번호가 일치하지 않습니다.", "오류", JOptionPane.ERROR_MESSAGE);
                   }
+              }
+          });
+          
+          /* ComboBox 이벤트 리스너 */
+          emailCombo.addActionListener(new ActionListener() {
+              @Override
+              public void actionPerformed(ActionEvent e) {
+            	  		JComboBox<String> cb = (JComboBox<String>) e.getSource();
+		                String selectedDomain = (String) cb.getSelectedItem();
+		                  
+		                String[] _e = (email.getText()).split("@");
+		                String emailStr = _e[0];
+		                  
+		                if (selectedDomain.equals("@(직접입력)")) {
+		                    String customDomain = JOptionPane.showInputDialog(null, "이메일 도메인을 입력합니다 :");
+		                    if (customDomain != null && !customDomain.isEmpty()) {
+		                        email.setText(emailStr + "@" + customDomain);
+		                    } else {
+		                      // 주소를 입력하지 않은 경우, 아무거솓 실행하지 않음 .
+		                  	  email.setText(emailStr);
+		                        emailCombo.setSelectedIndex(0);; // Select the first item "(직접입력)"
+		                    }
+		                 //나머지 도에민 주소 클릭시
+		                } else {
+		                    email.setText(emailStr + selectedDomain);
+		                }
               }
           });
 
@@ -359,32 +385,6 @@ public class JoinFrame extends JFrame{
             }
         });
         
-        /* ComboBox 이벤트 리스너 */
-        emailCombo.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                // 가입취소 버튼을 눌렀을 때는 아무 작업도 수행하지 않고 종료
-                if (e.getSource() == cancelBtn) {
-                    return;
-                }
-
-                String selectedDomain = (String) emailCombo.getSelectedItem();
-
-                if ("@(직접입력)".equals(selectedDomain)) {
-                    // If "(직접입력)" is selected, prompt the user for their own domain
-                    String customDomain = JOptionPane.showInputDialog(null, "이메일 도메인을 입력합니다 :");
-                    if (customDomain != null && !customDomain.isEmpty()) {
-                        email.setText(email.getText() + "@" + customDomain);
-                    } else {
-                        // If the user cancels or enters an empty domain, revert the selection
-                        emailCombo.setSelectedItem(emailCombo.getItemAt(0)); // Select the first item "(직접입력)"
-                    }
-                } else {
-                    // Append selected email domain to the email field
-                    email.setText(email.getText() + selectedDomain);
-                }
-            }
-        });
       
       setSize(380, 770);
       setLocationRelativeTo(null);
@@ -481,7 +481,6 @@ public class JoinFrame extends JFrame{
                phone1.setText("");
                phone2.setText("");
                email.setText("");
-               emailCombo.setSelectedIndex(0);
                post.setText("");
                road.setText("");
                detail.setText("");
@@ -497,9 +496,9 @@ public class JoinFrame extends JFrame{
                   JOptionPane.showMessageDialog(null, "모든 정보를 기입해주세요", "회원가입 실패", JOptionPane.ERROR_MESSAGE);
                   System.out.println("[Client] 회원가입 실패 : 회원정보 미입력");
               } else if (!uname.equals("") && !unick.equals("") && !uid.equals("") && !upass.equals("") && !upwcon.equals("") && !ugender.equals("성별") && !uyear.equals("년도") && !umonth.equals("월") && !uday.equals("일") && !unick.equals("") && !uphone.equals("") && !uphone2.equals("") && !uemail.equals("") && !upost.equals("") && !uroad.equals("") && !udetail.equals("")) {
-            	  
+            	  String uphone_full = uphone+uphone1+uphone2;
             	  // 회원가입 시도 성공
-                  c.sendMsg(joinTag + "//" + uname + "//" + unick + "//" + uid + "//" + upass + "//" + ugender + "//" + uyear + "//" + umonth + "//" + uday + "//" + uphone + "//" + uphone1 + "//" + uphone2 + "//" + uemail + "//" + upost + "//" + uroad + "//" + udetail + "//" + urole);   // 서버에 회원가입 정보 전송
+                  c.sendMsg(joinTag + "//" + uname + "//" + unick + "//" + uid + "//" + upass + "//" + ugender + "//" + uyear + "//" + umonth + "//" + uday + "//" + uphone_full + "//" + uemail + "//" + upost + "//" + uroad + "//" + udetail + "//" + urole);   // 서버에 회원가입 정보 전송
               }
           }
     }
@@ -514,8 +513,10 @@ public class JoinFrame extends JFrame{
 	}
 	
 	private void setDefaultProfileImage() {
-	    String defaultImagePath = "D:/hyuna/defalutimage.png";
+	    String defaultImagePath = "D:/hyuna/joindefalutimage.png";
 	    ImageIcon defaultImageIcon = new ImageIcon(defaultImagePath);
 
+	    // 기본 이미지를 프로필 이미지 레이블에 설정
+	    proImgL.setIcon(defaultImageIcon);
 	}
 }
