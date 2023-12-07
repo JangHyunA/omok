@@ -1,0 +1,704 @@
+package omok;
+
+import java.awt.EventQueue;
+import java.awt.Font;
+import java.awt.Image;
+
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JTable;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
+import javax.swing.ScrollPaneConstants;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumnModel;
+
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+
+import javax.swing.AbstractButton;
+import javax.swing.BorderFactory;
+import javax.swing.ButtonGroup;
+import javax.swing.ButtonModel;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JFileChooser;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+
+import java.awt.event.ActionListener;
+import java.io.File;
+import java.util.Enumeration;
+import java.awt.event.ActionEvent;
+import javax.swing.JRadioButton;
+import javax.swing.SwingConstants;
+import javax.swing.JScrollPane;
+import javax.swing.BoxLayout;
+
+public class AdminManageFrame extends JFrame {
+	
+	JPanel rootpanel = new JPanel();
+	/* panelTop */
+	JPanel panelTop = new JPanel();								// 상단 패널
+	JTextField SearchL = new JTextField();
+	JComboBox<String> SearchColCbx = new JComboBox<String>();
+	JTextField search = new JTextField();   		 // 검색어 입력 텍스트필드 생성
+	JButton btnSearch = new JButton("검색");
+
+	
+	
+	JPanel tablePanel = new JPanel();								// 테이블 패널 생성
+	String[][] data;
+	String[] header = {"id_no","name","nickname","id","password","gender","year","month",
+				"day","phone","post","road","detail","email","imgpath","role","win","lose","admin_code"};
+	DefaultTableModel tableModel = new DefaultTableModel( header,0) {                    // 셀에서 편집할 수 없게 함.
+	        @Override
+	        public boolean isCellEditable(int row, int column) {
+	            return false;
+	        }
+	    }; // 테이블 데이터 편집하기 위해 필요
+	   
+	JTable table= new JTable(tableModel);
+	JScrollPane scrollPane = new JScrollPane(table, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+
+	
+	JPanel panel_btn = new JPanel();
+	JButton btnInsert = new JButton("추가");
+	JButton btnDelete = new JButton("삭제");
+	JButton btnUpdate = new JButton("변경");
+	
+	int selectedIdx;
+	
+	/*panelBottom*/
+	JPanel panelBottom= new JPanel();								// 하단 패널
+	JButton btnCancel = new JButton("취소");
+	JButton btnSave = new JButton("저장");
+
+	JLabel lblNewLabel = new JLabel("회원 정보");
+	
+	ButtonGroup roleG = new ButtonGroup();
+	JTextField tf_roleL = new JTextField();
+	JRadioButton role_admin = new JRadioButton("관리자");
+	JRadioButton role_user = new JRadioButton("일반 회원",true);
+	
+	JTextField tf_idL = new JTextField();
+	JTextField tf_id = new JTextField();
+	JTextField tf_nameL = new JTextField();
+	JTextField tf_name = new JTextField();
+	JTextField tf_pwL = new JTextField();
+	JTextField tf_password = new JTextField();
+	JTextField tf_nicknameL = new JTextField();
+	JTextField tf_nickname = new JTextField();
+	JTextField tf_phoneL = new JTextField();
+	JTextField tf_phone = new JTextField();
+	JTextField tf_emailL = new JTextField();
+	JTextField tf_email = new JTextField();
+	JTextField tf_postL = new JTextField();
+	JTextField tf_post = new JTextField();
+	JTextField tf_roadL = new JTextField();
+	JTextField tf_road = new JTextField();
+	JTextField tf_detailL = new JTextField();
+	JTextField tf_detail = new JTextField();
+	JButton btnPost = new JButton("우편번호 검색");
+	
+	JTextField tf_birthL = new JTextField();
+	JComboBox<String> tf_year = new JComboBox<String>();
+	JComboBox<String> tf_month = new JComboBox<String>();
+	JComboBox<String> tf_day = new JComboBox<String>();
+	JTextField tf_ImgL = new JTextField();
+	JLabel tf_proImgL = new JLabel("프로필 이미지 ");
+	JButton btnImg = new JButton("이미지 검색");
+	
+	ButtonGroup genderG = new ButtonGroup();
+	JTextField tf_genderL = new JTextField();
+	JRadioButton tf_man = new JRadioButton(" 남");
+	JRadioButton tf_woman = new JRadioButton(" 여");
+
+	
+	final String imgTag = "IMG";			//프로필 이미지
+	final String imgPathTag = "IMGPATH";	//이미지 절대경로
+	final String VimgTag = "VIMG";
+	
+	final String m_SearchTotalTag = "MSEARCHTOTAL";
+	final String m_SearchTag = "MSEARCH";
+	final String m_AddTag = "MADD";
+	final String m_UpdateTag = "MUPDATE";
+	final String m_DeleteTag = "MDELETE";
+	final String m_SaveTag = "MSAVE";
+	
+	
+	Client c= null;
+	
+	DataBase_Manage m_db ;
+
+	public AdminManageFrame(Client _c) {
+				
+		c = _c;
+		
+		m_db = new DataBase_Manage();
+		
+		setTitle("회원 관리");  						// 메인 프레임
+		
+		rootpanel.setPreferredSize(new Dimension(650,750));								// 프레임 크기
+	//	setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);	// 종료 버튼 누르면 프로그램 종료  ->  회원관리창만 나가야 함. 
+		setLocationRelativeTo(null);						// 프레임을 화면 중앙에 배치
+		setResizable(false);								// 프레임 크기를 변경하지 못하도록 설정
+
+		
+		panelTop.setPreferredSize(new Dimension(635, 25));				// 패널 위치와 크기  -> (x좌표, y좌표, 넓이, 높이)
+		panelTop.setBorder(BorderFactory.createEmptyBorder(2,0,0,0));
+		panelTop.setLayout(null);								// 상단 패널에 추가되는 컴포넌트 레이아웃 -> Absolute
+		panelTop.setVisible(true);								// 패널 보이기
+		
+
+	
+		SearchL.setEditable(false);
+		SearchL.setText("검색 조건");
+		SearchL.setHorizontalAlignment(SwingConstants.CENTER);
+		SearchL.setFont(new Font("Dialog", Font.BOLD, 15));
+		SearchL.setColumns(10);
+		SearchL.setBounds(12, 5, 76, 25);
+		panelTop.add(SearchL);
+		
+		
+		SearchColCbx.setBounds(94,5,107,25);
+		String[] searchCol = {"전체","회윈등급","이름","닉네임","아이디","성별"};
+		for(int i =0; i<searchCol.length;i++) {
+			SearchColCbx.addItem(searchCol[i]);
+		}
+		SearchColCbx.setSelectedItem(searchCol[0]);
+		panelTop.add(SearchColCbx);// 상단 패널에 붙이기
+		
+		search.setBounds(213, 5, 138, 25);	 // 검색어 입력 텍스트필드 위치와 크기
+		search.setColumns(20);				 // 검색어 길이 설정 
+		panelTop.add(search);				 // 상단 패널에 붙이기
+		
+		btnSearch.setBackground(new Color(255, 255, 255));
+		btnSearch.setBounds(363, 5, 65, 25);
+		panelTop.add(btnSearch);
+		
+		
+		tablePanel.setPreferredSize(new Dimension(630,225));
+		tablePanel.setVisible(true);								// 패널 보이기
+	
+		
+
+		
+		/*
+		searchTextField.addKeyListener(new KeyAdapter() {    // 검색어 입력 텍스트필드 이벤트
+			public void keyReleased(KeyEvent e) {
+				String val = searchTextField.getText();		 
+				TableRowSorter<TableModel> trs = new TableRowSorter<>(table.getModel());
+				table.setRowSorter(trs);
+				trs.setRowFilter(RowFilter.regexFilter(val));
+			}
+		});*/
+		
+		panel_btn.setPreferredSize(new Dimension(630, 30));
+		panel_btn.setLayout(null);
+		panel_btn.setVisible(true);
+	
+		
+		btnInsert.setFont(new Font("굴림", Font.BOLD, 12));
+		btnInsert.setBackground(new Color(255, 255, 255));
+		btnInsert.setBounds(416, 5, 64, 30);
+		panel_btn.add(btnInsert);
+
+		
+		btnUpdate.setFont(new Font("굴림", Font.BOLD, 12));
+		btnUpdate.setBackground(new Color(255, 255, 255));
+		btnUpdate.setBounds(559, 5, 64, 30);
+		panel_btn.add(btnUpdate);
+
+		
+		btnDelete.setFont(new Font("굴림", Font.BOLD, 12));
+		btnDelete.setBackground(new Color(255, 255, 255));
+		btnDelete.setBounds(487, 5, 65, 30);
+		panel_btn.add(btnDelete);
+		
+		panelBottom.setPreferredSize(new Dimension(630,380));
+	//	panelBottom.setBounds(5, 315, 630, 380);				// 패널 위치와 크기  -> (x좌표, y좌표, 넓이, 높이)
+		panelBottom.setLayout(null);							// 하단 패널에 추가되는 컴포넌트 레이아웃 -> Absolute
+		panelBottom.setVisible(false);  						// 하단 패널 가리기
+	
+		
+		btnSave.setFont(new Font("굴림", Font.BOLD, 12));
+		btnSave.setBackground(new Color(255, 255, 255));
+		btnSave.setBounds(560, 2, 64, 30);
+		panelBottom.add(btnSave);
+
+		
+		btnCancel.setFont(new Font("굴림", Font.BOLD, 12));
+		btnCancel.setBackground(new Color(255, 255, 255));
+		btnCancel.setBounds(485, 2, 64, 30);
+		panelBottom.add(btnCancel);
+
+		
+		lblNewLabel.setFont(new Font("Dialog", Font.BOLD, 16));
+		lblNewLabel.setBounds(12, 0, 81, 30);
+		panelBottom.add(lblNewLabel);
+		
+		tf_roleL.setHorizontalAlignment(SwingConstants.CENTER);
+		tf_roleL.setText("회원등급");
+		tf_roleL.setFont(new Font("Dialog", Font.PLAIN, 14));
+		tf_roleL.setEditable(false);
+		tf_roleL.setColumns(10);
+		tf_roleL.setBounds(12, 35, 80, 27);
+		panelBottom.add(tf_roleL);
+		
+
+		role_user.setFont(new Font("굴림", Font.PLAIN, 14));
+		role_user.setBounds(170, 30, 92, 35);
+		panelBottom.add(role_user);
+		
+		role_admin.setFont(new Font("굴림", Font.PLAIN, 14));
+		role_admin.setBounds(97, 30, 68, 33);
+		panelBottom.add(role_admin);
+		
+		roleG.add(role_user);
+		roleG.add(role_admin);
+		
+		
+		tf_nicknameL.setHorizontalAlignment(SwingConstants.CENTER);
+		tf_nicknameL.setText("닉 네 임");
+		tf_nicknameL.setFont(new Font("Dialog", Font.PLAIN, 14));
+		tf_nicknameL.setEditable(false);
+		tf_nicknameL.setColumns(10);
+		tf_nicknameL.setBounds(12, 100, 80, 30);
+		panelBottom.add(tf_nicknameL);
+		
+		tf_nickname.setColumns(30);
+		tf_nickname.setBounds(100, 100, 160, 30);
+		panelBottom.add(tf_nickname);
+
+		tf_idL.setHorizontalAlignment(SwingConstants.CENTER);
+		tf_idL.setText("아 이 디");
+		tf_idL.setEditable(false);
+		tf_idL.setFont(new Font("Lucida Grande", Font.PLAIN, 14));
+		tf_idL.setColumns(10);
+		tf_idL.setBounds(12, 135, 80, 30);
+		panelBottom.add(tf_idL);
+
+		tf_id.setColumns(30);
+		tf_id.setBounds(100, 135, 160, 30);
+		panelBottom.add(tf_id);
+		
+		tf_nameL.setHorizontalAlignment(SwingConstants.CENTER);
+		tf_nameL.setEditable(false);
+		tf_nameL.setText("이  름");
+		tf_nameL.setFont(new Font("Lucida Grande", Font.PLAIN, 14));
+		tf_nameL.setColumns(10);
+		tf_nameL.setBounds(12, 65, 80, 30);
+		panelBottom.add(tf_nameL);
+		
+		tf_name.setBounds(100, 65, 160, 30);
+		panelBottom.add(tf_name);
+
+		tf_pwL.setHorizontalAlignment(SwingConstants.CENTER);
+		tf_pwL.setEditable(false);
+		tf_pwL.setText("비밀번호");
+		tf_pwL.setFont(new Font("Lucida Grande", Font.PLAIN, 14));
+		tf_pwL.setColumns(10);
+		tf_pwL.setBounds(12, 170, 80, 30);
+		panelBottom.add(tf_pwL);
+
+		tf_password.setColumns(10);
+		tf_password.setBounds(100, 170, 160, 30);
+		panelBottom.add(tf_password);
+		
+		tf_emailL.setHorizontalAlignment(SwingConstants.CENTER);
+		tf_emailL.setText("이 메 일 ");
+		tf_emailL.setFont(new Font("Dialog", Font.PLAIN, 14));
+		tf_emailL.setEditable(false);
+		tf_emailL.setColumns(10);
+		tf_emailL.setBounds(12, 205, 80, 30);
+		panelBottom.add(tf_emailL);
+		
+		tf_email.setColumns(50);
+		tf_email.setBounds(100, 205, 160, 30);
+		panelBottom.add(tf_email);
+		
+		tf_phoneL.setHorizontalAlignment(SwingConstants.CENTER);
+		tf_phoneL.setText("전화번호");
+		tf_phoneL.setFont(new Font("Dialog", Font.PLAIN, 14));
+		tf_phoneL.setEditable(false);
+		tf_phoneL.setColumns(10);
+		tf_phoneL.setBounds(12, 240, 80, 30);
+		panelBottom.add(tf_phoneL);
+
+		tf_phone.setColumns(30);
+		tf_phone.setBounds(100, 240, 160, 30);
+		panelBottom.add(tf_phone);
+		
+
+		tf_birthL.setHorizontalAlignment(SwingConstants.CENTER);
+		tf_birthL.setText("생년월일");
+		tf_birthL.setFont(new Font("Dialog", Font.PLAIN, 14));
+		tf_birthL.setEditable(false);
+		tf_birthL.setColumns(10);
+		tf_birthL.setBounds(12, 275, 80, 30);
+		panelBottom.add(tf_birthL);
+	
+		tf_year.addItem("년도");
+        for(int i= 1910; i <= 2023;i++) {
+      	  String year = String.valueOf(i);
+      	  tf_year.addItem(year);
+        }
+		tf_year.setBounds(100, 275, 64, 30);
+		panelBottom.add(tf_year);
+		
+		tf_month.addItem("월");
+         for(int i= 1; i <= 12;i++) {
+      	   String month = String.valueOf(i);
+      	   tf_month.addItem(month);
+         }
+		tf_month.setBounds(170, 275, 50, 30);
+		panelBottom.add(tf_month);
+		
+		tf_day.addItem("일");
+         for(int i= 1; i <= 31;i++) {
+      	   String day = String.valueOf(i);
+      	   tf_day.addItem(day);
+         }
+		tf_day.setBounds(225, 275, 50, 30);
+		panelBottom.add(tf_day);
+		
+		tf_genderL.setHorizontalAlignment(SwingConstants.CENTER);
+		tf_genderL.setText("성  별 ");
+		tf_genderL.setFont(new Font("Dialog", Font.PLAIN, 14));
+		tf_genderL.setEditable(false);
+		tf_genderL.setColumns(10);
+		tf_genderL.setBounds(12, 310, 80, 30);
+		panelBottom.add(tf_genderL);
+		
+		tf_man.setFont(new Font("굴림", Font.PLAIN, 15));
+		tf_man.setBounds(100, 305, 54, 41);
+		panelBottom.add(tf_man);
+		
+		tf_woman.setFont(new Font("굴림", Font.PLAIN, 15));
+		tf_woman.setBounds(150, 305, 74, 41);
+		panelBottom.add(tf_woman);
+		
+		genderG.add(tf_man);
+		genderG.add(tf_woman);
+		
+		tf_postL.setHorizontalAlignment(SwingConstants.CENTER);
+		tf_postL.setEditable(false);
+		tf_postL.setText("우편번호");
+		tf_postL.setFont(new Font("Lucida Grande", Font.PLAIN, 14));
+		tf_postL.setColumns(10);
+		tf_postL.setBounds(270, 65, 80, 30);
+		panelBottom.add(tf_postL);
+
+		tf_post.setColumns(10);
+		tf_post.setBounds(362, 66, 81, 30);
+		panelBottom.add(tf_post);
+				
+		btnPost.setBackground(new Color(255, 255, 255));
+		btnPost.setBounds(456, 65, 115, 30);
+		panelBottom.add(btnPost);
+		
+		tf_roadL.setHorizontalAlignment(SwingConstants.CENTER);
+		tf_roadL.setText("주  소");
+		tf_roadL.setFont(new Font("Dialog", Font.PLAIN, 14));
+		tf_roadL.setEditable(false);
+		tf_roadL.setColumns(10);
+		tf_roadL.setBounds(270, 100, 80, 30);
+		panelBottom.add(tf_roadL);
+		
+		tf_road.setColumns(100);
+		tf_road.setBounds(362, 100, 211, 30);
+		panelBottom.add(tf_road);
+		
+		tf_detailL.setHorizontalAlignment(SwingConstants.CENTER);
+		tf_detailL.setText("상세주소");
+		tf_detailL.setFont(new Font("Dialog", Font.PLAIN, 14));
+		tf_detailL.setEditable(false);
+		tf_detailL.setColumns(10);
+		tf_detailL.setBounds(270, 135, 80, 30);
+		panelBottom.add(tf_detailL);
+		
+		tf_detail.setColumns(100);
+		tf_detail.setBounds(362, 135, 211, 30);
+		panelBottom.add(tf_detail);
+		
+		tf_ImgL.setHorizontalAlignment(SwingConstants.CENTER);
+		tf_ImgL.setText("프 로 필");
+		tf_ImgL.setFont(new Font("Dialog", Font.PLAIN, 14));
+		tf_ImgL.setEditable(false);
+		tf_ImgL.setColumns(10);
+		tf_ImgL.setBounds(270, 170, 80, 30);
+		panelBottom.add(tf_ImgL);
+	
+		
+		btnImg.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+			}
+		});
+		btnImg.setBounds(264,205, 100, 30);
+		panelBottom.add(btnImg);
+		
+		tf_proImgL.setHorizontalAlignment(SwingConstants.CENTER);
+		tf_proImgL.setBounds(370, 176, 250, 200);
+		panelBottom.add(tf_proImgL);
+		
+		
+		rootpanel.setLayout(new BoxLayout(rootpanel,BoxLayout.Y_AXIS));
+		rootpanel.add(panelTop);
+		rootpanel.add(tablePanel);
+		rootpanel.add(panel_btn);
+		rootpanel.add(panelBottom);
+		
+		getContentPane().add(rootpanel);
+		setSize(650,750);
+		
+		
+		
+		ButtonListener bl = new ButtonListener();
+		
+
+		btnInsert.addActionListener(bl);
+		btnUpdate.addActionListener(bl);
+		btnDelete.addActionListener(bl);
+		
+		btnCancel.addActionListener(bl);
+		btnSave.addActionListener(bl);
+		
+
+		btnSearch.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				String col = (String)SearchColCbx.getSelectedItem();
+				String val = search.getText();
+				String att = "";
+
+				if(!col.equals(null)) {
+					if(col.equals("전체")) {
+						showTable();
+					}
+					else if (!val.isEmpty()) {
+						if (col.equals("회원등급")) 	att = "role";
+						else if( col.equals("이름")) att = "name";
+						else if( col.equals("닉네임")) att = "nickname";
+						else if( col.equals("아이디")) att = "id";
+						else if( col.equals("성별")) att = "gender";
+						c.sendMsg(m_SearchTag+"//"+ att+"//"+ val);
+						
+					}
+					
+					else {
+						JOptionPane.showMessageDialog(null,"검색 조건이 맞지 않습니다", "회원 검색",JOptionPane.ERROR_MESSAGE);
+					}
+							
+							
+					
+				}
+			}
+		});
+		
+		btnPost.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				AddressSearchFrame asF = new AddressSearchFrame();
+                asF.setVisible(true);
+			}
+		});
+		
+		btnImg.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                JFileChooser fileChooser = new JFileChooser();
+                fileChooser.setDialogTitle("프로필 이미지 선택");
+                fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY); // 파일 선택 모드 설정
+                int userSelection = fileChooser.showOpenDialog(AdminManageFrame.this);
+
+                // 파일 선택 다이얼로그를 통해 이미지 선택
+                if (userSelection == JFileChooser.APPROVE_OPTION) {
+                    File imageFile = fileChooser.getSelectedFile();
+                    ImageIcon originalImageIcon = new ImageIcon(imageFile.getAbsolutePath());
+                    Image originalImage = originalImageIcon.getImage();
+                    Image scaledImage = originalImage.getScaledInstance(tf_proImgL.getWidth(), tf_proImgL.getHeight(), Image.SCALE_SMOOTH);
+                    ImageIcon  scaledImageIcon = new ImageIcon(scaledImage);
+   
+                    c.sendMsg(imgPathTag+"//"+imageFile.getAbsolutePath());
+                    c.sendMsg(imgTag+ "//"+ imageFile.getAbsolutePath() );
+                    tf_proImgL.setIcon(scaledImageIcon);
+                }
+            }
+        });
+		
+		btnInsert.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				 System.out.println("[Client_Admin] 관리자 회원 추가  ");
+				 panelBottom.setVisible(true);
+			}
+		});
+			
+		btnUpdate.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
+		
+		btnDelete.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
+		
+	} // 생성자 끝
+
+	
+	class ButtonListener implements ActionListener{
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		 JButton b = (JButton)e.getSource();
+		 String _urole = "";
+		 String _gen = "";
+		 Enumeration<AbstractButton> enums_r = roleG.getElements();
+		 while(enums_r.hasMoreElements()) {
+			 AbstractButton ab = enums_r.nextElement();
+			 JRadioButton jb = (JRadioButton) ab;
+			 
+			 if(jb.isSelected()) {
+				 _urole=jb.getText();
+				 System.out.println(_urole);
+			 }
+		 }
+		 
+		 Enumeration<AbstractButton> enums_g = genderG.getElements();
+		 while(enums_g.hasMoreElements()) {
+			 AbstractButton ab = enums_g.nextElement();
+			 JRadioButton jb = (JRadioButton) ab;
+			 
+			 if(jb.isSelected()) {
+				 _gen=jb.getText();
+				 System.out.println(_gen);
+			 }
+		 }
+		 
+		 
+		 /* TextField에 입력된 회원 정보들을 변수에 초기화 */
+		 String urole = _urole;
+         String uname = tf_name.getText();
+         String unick = tf_nickname.getText();
+         String uid = tf_id.getText();
+         String upass = tf_password.getText();
+         String ugender = _gen;
+         String uyear = (String) tf_year.getSelectedItem();
+         String umonth = (String) tf_month.getSelectedItem();
+         String uday = (String) tf_day.getSelectedItem();
+         String uphone = tf_phone.getText();
+         String uemail = tf_email.getText();
+         String upost = tf_post.getText();
+         String uroad = tf_road.getText();
+         String udetail = tf_detail.getText();
+         
+         
+		 // panelBottom //
+		 if(b.getText().equals("취소")) {
+			 
+			  // 모든 입력 필드 리셋
+             tf_name.setText("");
+             tf_nickname.setText("");
+             tf_id.setText("");
+             tf_password.setText("");
+           
+             tf_year.setSelectedIndex(0);
+             tf_month.setSelectedIndex(0);
+             tf_day.setSelectedIndex(0);
+             tf_phone.setText("");
+             tf_email.setText("");
+             tf_post.setText("");
+             tf_road.setText("");
+             tf_detail.setText("");
+             tf_proImgL.setIcon(null);
+             
+        	panelBottom.setVisible(false);
+		 }
+		 else if(b.getText().equals("저장")) {
+			 if (uname.equals("") || unick.equals("") || uid.equals("") || upass.equals("") || ugender.equals("") || uyear.equals("년도") || umonth.equals("월") || uday.equals("일") || uphone.equals("") || uemail.equals("") || upost.equals("") || uroad.equals("") || udetail.equals("")) {
+           	  // 모든 정보가 입력되지 않으면 회원가입 시도 실패
+                 JOptionPane.showMessageDialog(null, "모든 정보를 기입해주세요", "정보 변경 및 추가 ", JOptionPane.ERROR_MESSAGE);
+                 System.out.println("[Client] 정보 변경 실패 : 회원정보 미입력");
+             } else if (!uname.equals("") && !unick.equals("") && !uid.equals("") && !upass.equals("") && !ugender.equals("성별") && !uyear.equals("년도") && !umonth.equals("월") && !uday.equals("일") && !unick.equals("") && !uphone.equals("") && !uemail.equals("") && !upost.equals("") && !uroad.equals("") && !udetail.equals("")) {
+           	 
+           	  // 회원가입 시도 성공
+                 c.sendMsg(m_SaveTag + "//" + unick + "//" + uname + "//" + uid + "//" + upass + "//" + ugender + "//" + uyear + "//" + umonth + "//" + uday + "//" +uphone +"//" + uemail + "//" + upost + "//" + uroad + "//" + udetail + "//" + urole);   // 서버에 회원가입 정보 전송
+             }
+		 }
+		
+	}
+		
+	}
+	
+	public void showTable() {
+		
+		data = m_db.getUsers();
+	//	for(String[] item:data)
+	//			for(String ii: item)
+	//					System.out.println(ii);
+
+	    table.setBounds(8,32,630,225);
+	    
+		
+		// 테이블에 스크롤바 추가
+		scrollPane.setBounds(8,32,630,225);
+	//	scrollPane.setPreferredSize(new Dimension(630,225)); //Layout이 적용된 부분에서는 setPreffersize 만 사용 가능
+		
+		scrollPane.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));   // padding(상, 좌, 하, 우)
+		scrollPane.setViewportView(table);
+		tablePanel.add(scrollPane); // JScrollPane을 panelTop에 바로 올리면 안 보임. 전용 tablePanel에 올려야 보임
+		
+		for (int i =0; i<data.length; i++) {			
+			tableModel.addRow(data[i]);
+		}
+		
+	    // 셀 값 가운데 정렬
+	    DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+	    centerRenderer.setHorizontalAlignment( SwingConstants.CENTER );
+	    for (int  i =0; i<header.length;i++) {
+	   	    	table.getColumnModel().getColumn(i).setCellRenderer( centerRenderer );
+	    }
+	    TableCellRenderer rendererFromHeader = table.getTableHeader().getDefaultRenderer();
+	    JLabel headerLabel = (JLabel) rendererFromHeader;
+	    headerLabel.setHorizontalAlignment(JLabel.CENTER);
+	    
+	    table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);  //행을 하나만 선택할 수 있도록
+
+	    // 컬럼 크기
+	    TableColumnModel colModel = table.getColumnModel();
+	    for (int  i =0; i<header.length;i++) {
+	    	colModel.getColumn(i).setPreferredWidth(50);   	
+	    }
+
+	    table.getTableHeader().setFont(new Font("NanumGothic", Font.BOLD, 12));  // header 폰트 설정
+	    table.getTableHeader().setPreferredSize(new Dimension(630,20));
+	    table.setFont(new Font("NanumGothic", Font.PLAIN, 13));                 // 셀 폰트, 크기
+	    table.setRowHeight(20);
+	    table.setVisible(true);
+	    table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+//	      table.setAlignmentX(0);
+
+	    tablePanel.add(table);
+	
+	}
+		
+		
+}
