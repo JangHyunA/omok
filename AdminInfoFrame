@@ -1,0 +1,351 @@
+package omok;
+
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Graphics;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+
+import javax.swing.Action;
+import javax.swing.ButtonGroup;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JPasswordField;
+import javax.swing.JRadioButton;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
+import javax.swing.border.EmptyBorder;
+
+import omok.AdminFrame.ButtonListener;
+
+public class AdminInfoFrame extends JFrame{
+	
+	/* Panel */
+	JPanel panel = new JPanel();
+	JPanel panel_img = new JPanel();
+	JPanel panel_rest = new JPanel();
+	
+	/* Label */
+	JLabel roleL = new JLabel ("회원 유형");
+	JLabel nicknameL = new JLabel("닉네임");
+	JLabel nameL = new JLabel("이름");
+	JLabel idL = new JLabel("아이디");
+	JLabel proImgL = new JLabel();
+	JLabel emptyL = new JLabel();
+	//JLabel pwL = new JLabel("비밀번호");
+	
+	JLabel emailL = new JLabel("이메일");       
+	JLabel phoneL = new JLabel("전화번호");
+	JLabel genderL = new JLabel("성별");
+	JLabel birthL = new JLabel(" 생년월일");
+	
+	JLabel postL = new JLabel("우편번호");
+	JLabel roadL = new JLabel("도로명주소");
+    JLabel detailL = new JLabel("상세주소");
+
+    JLabel rankL = new JLabel("전적");
+    JLabel winL = new JLabel("승");
+    JLabel loseL = new JLabel("패");
+    
+    /* TextField */
+    JTextField nickname = new JTextField();
+    JTextField name = new JTextField();
+    JTextField id = new JTextField();
+    JTextField email = new JTextField();
+    
+    JTextField phone = new JTextField();
+    JTextField gender = new JTextField();
+    JTextField birth_year = new JTextField();
+    JTextField birth_month = new JTextField();
+    JTextField birth_day = new JTextField();
+    
+    JTextField post = new JTextField();
+    JTextField road = new JTextField();
+    JTextField detail = new JTextField();
+    
+    JTextField win = new JTextField();
+    JTextField lose = new JTextField();
+
+    /* Button */
+    JButton pwBtn = new JButton("비밀번호 초기화");
+    JButton readBtn = new JButton("저장");
+    JButton exitgameBtn = new JButton("회원 탈퇴");
+    
+    JRadioButton user = new JRadioButton("일반회원");
+    JRadioButton admin = new JRadioButton("관리자");
+    
+    ButtonGroup role = new ButtonGroup();
+    
+    
+    ImageIcon proImg;
+    
+    Client c = null;
+    
+    String o_nickname = "";
+    
+	final String resetpwTag = "RESET";	//비밀번호 초기화
+	final String outgameTag = "OUT";	//강제 탈퇴하기
+	final String updateUserTag = "UPDATE"; // 회원 정보 수정
+	
+    public AdminInfoFrame(Client _c) {
+    	
+		c = _c;
+		
+		setTitle("회원 정보 조회");
+		
+		
+		 /*닉네임,이름, 아이디 크기작업 */
+		panel.setPreferredSize(new Dimension(165,180));		
+
+		roleL.setPreferredSize(new Dimension(150,20));
+		roleL.setHorizontalAlignment(SwingConstants.CENTER);
+		
+		nicknameL.setPreferredSize(new Dimension(50,30));
+
+		nameL.setPreferredSize(new Dimension(50,30));
+		idL.setPreferredSize(new Dimension(50,30));
+		
+		/* 프로필 이미지 */
+		String imagePath = "D:/hyuna/defalutimage.png";
+
+		// 이미지 아이콘 생성
+		ImageIcon proImg = new ImageIcon(imagePath);
+
+		// JLabel 대신에 JPanel을 사용하여 직접 이미지를 그림
+		JPanel imagePanel = new JPanel() {
+		    @Override
+		    protected void paintComponent(Graphics g) {
+		        super.paintComponent(g);
+		        g.drawImage(proImg.getImage(), 0, 0, getWidth(), getHeight(), this);
+		    }
+		};
+
+		// JPanel의 크기 설정
+		imagePanel.setPreferredSize(new Dimension(160, 190));
+
+		// panel_img에 이미지가 그려진 JPanel 추가
+		panel_img.add(imagePanel);		
+	
+		/* 기타 정보 크기작업 */
+		panel_rest.setPreferredSize(new Dimension(280,300));
+
+		emailL.setPreferredSize(new Dimension(70,30));
+		
+		phoneL.setPreferredSize(new Dimension(70,30));
+		genderL.setPreferredSize(new Dimension(35,30));
+		birthL.setPreferredSize(new Dimension(60,30));
+		postL.setPreferredSize(new Dimension(70,30));
+		roadL.setPreferredSize(new Dimension(70,30));
+		detailL.setPreferredSize(new Dimension(70,30));
+		
+		rankL.setPreferredSize(new Dimension(40,30));
+		winL.setPreferredSize(new Dimension(60,30));
+		winL.setHorizontalAlignment(SwingConstants.CENTER);
+		loseL.setPreferredSize(new Dimension(60,30));
+		loseL.setHorizontalAlignment(SwingConstants.CENTER);
+		
+		/* RadioButton 크기 작업 */
+		user.setPreferredSize(new Dimension(80,20));
+		admin.setPreferredSize(new Dimension(70,20 ));
+		
+		 /* TextField 크기 작업 */
+		nickname.setPreferredSize(new Dimension(100,30));
+	
+		name.setPreferredSize(new Dimension(100,30));
+		id.setPreferredSize(new Dimension(100,30));
+		
+		
+		email.setPreferredSize(new Dimension(230,30));
+		phone.setPreferredSize(new Dimension(230,30));
+		gender.setPreferredSize(new Dimension(50,30));
+		birth_year.setPreferredSize(new Dimension(50,30));
+		birth_month.setPreferredSize(new Dimension(50,30));
+		birth_day.setPreferredSize(new Dimension(50,30));
+		post.setPreferredSize(new Dimension(90,30));
+		emptyL.setPreferredSize(new Dimension(130,0));
+		road.setPreferredSize(new Dimension(230,30));
+		detail.setPreferredSize(new Dimension(230,30));
+		
+		win.setPreferredSize(new Dimension(60,30));
+		lose.setPreferredSize(new Dimension(60,30));
+		
+		pwBtn.setPreferredSize(new Dimension(150,30));
+		exitgameBtn.setPreferredSize(new Dimension(150,30));
+		
+		user.setSelected(true);
+		role.add(user);
+		role.add(admin);
+		
+		//===========================
+		
+		panel.add(roleL);
+		panel.add(user);
+		panel.add(admin);
+
+		panel.add(nicknameL);
+		panel.add(nickname);
+		
+		panel.add(nameL);
+		panel.add(name);
+
+		panel.add(idL);
+		panel.add(id);
+		
+		panel_img.add(proImgL);
+		
+	
+		panel_rest.add(emailL);
+		panel_rest.add(email);
+		
+		panel_rest.add(phoneL);
+		panel_rest.add(phone);
+		
+		panel_rest.add(genderL);
+		panel_rest.add(gender);
+		
+		panel_rest.add(birthL);
+		panel_rest.add(birth_year);
+		panel_rest.add(birth_month);
+		panel_rest.add(birth_day);
+		
+		 panel_rest.add(postL);
+         panel_rest.add(post);
+         panel_rest.add(emptyL);
+		
+         panel_rest.add(roadL);
+         panel_rest.add(road);
+         panel_rest.add(detailL);
+         panel_rest.add(detail);
+
+         panel_rest.add(rankL);
+         panel_rest.add(winL);
+         panel_rest.add(win);
+         panel_rest.add(loseL);
+         panel_rest.add(lose);
+         
+         panel_rest.add(pwBtn);
+         panel_rest.add(exitgameBtn);
+		
+		setLayout(new BorderLayout());
+		add(panel,BorderLayout.WEST);
+		add(panel_img,BorderLayout.EAST);
+		add(panel_rest,BorderLayout.SOUTH);
+		
+		ButtonListener bl = new ButtonListener();
+		
+		pwBtn.addActionListener(bl);
+		exitgameBtn.addActionListener(bl);
+		
+		// 'x' 버튼 누르고 나갈 때 수정사항 저장 
+		addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+            	int  check_save = JOptionPane.showConfirmDialog(null, "저장할까요?","확인",JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+            	if(check_save == JOptionPane.YES_OPTION) {
+            		
+            		String urole = getSelectedRole();
+            		
+            		String unick = nickname.getText();
+           	     	String uname = name.getText();
+                    String uid = id.getText();
+                    String uemail = email.getText();
+                    String uphone = phone.getText();
+                    String ugender = gender.getText();
+                    String uyear = birth_year.getText();
+                    String umonth = birth_month.getText();
+                    String uday = birth_day.getText();                     
+                    String upost = post.getText();
+                    String uroad = road.getText();
+                    String udetail = detail.getText();
+                    String uwin = win.getText();
+                    String ulose = lose.getText();
+        		 
+                    System.out.println("[Client_admin] 회원 정보 업데이트 시도");
+                    
+                    c.sendMsg(updateUserTag + "//" + o_nickname + "//"+ urole +"//" +uname+ "//" +unick + "//" + uid+ "//" + ugender + "//"
+                    					+ uyear + "//" + umonth + "//" + uday + "//" + uphone + "//" + upost + "//" 
+                    					+ uroad + "//" + udetail + "//" + uemail + "//" + uwin + "//" + ulose );
+            	}
+            	else {
+            		c.aif.setVisible(false);
+            		c.aif.dispose();
+            	}
+            }
+        });
+
+		setSize(350,500);
+		setLocationRelativeTo(null);
+		setResizable(false);
+	}
+    
+    /* 라디오 버튼 가져오기 */
+    private String getSelectedRole() {
+    	if (user.isSelected()) {
+    		return "USER";
+    	}
+    	else if( admin.isSelected()) {
+    		return "ADMIN";
+    	}
+    	else {
+    		return "FAIL";
+    	}
+    }
+    
+    /* 버튼 이벤트 리스너 */
+    class ButtonListener implements ActionListener{
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			JButton b = (JButton)e.getSource();
+			
+			/* 비밀번호 초기화 버튼 이벤트 */
+			if(b.getText().equals("비밀번호 초기화")) {
+				String nick = nickname.getText();
+				if (!nick.isEmpty()) {
+					int result = JOptionPane.showConfirmDialog(null,nick+"님의\n 비밀번호를 초기화할까요?","비밀번호 초기화",
+							+JOptionPane.YES_NO_OPTION,JOptionPane.QUESTION_MESSAGE);
+					if(result == JOptionPane.NO_OPTION){
+						JOptionPane.showMessageDialog(null, "취소합니다.");
+					}else {
+						System.out.println("[Client_admin] 비밀번호 초기화 시도 ");
+						c.sendMsg(resetpwTag + "//password//" + nick);
+					}
+				}
+				else {
+					JOptionPane.showMessageDialog(null, "사용자를 선택해주세요.","비밀번호 초기화-사용자선택",JOptionPane.ERROR_MESSAGE);
+				}
+			}
+			/* 강제 탈퇴하기 버튼 이벤트*/  
+			else if(b.getText().equals("회원 탈퇴")) {
+					String nick = nickname.getText();
+			        if (!nick.isEmpty()) {
+						int result = JOptionPane.showConfirmDialog(null, nick+"님 탈퇴를 진행할까요?","강제 탈퇴",JOptionPane.YES_NO_OPTION,JOptionPane.WARNING_MESSAGE);
+						if(result == JOptionPane.NO_OPTION){
+							JOptionPane.showMessageDialog(null, "취소합니다.");
+						}else {
+							System.out.println("[Client_admin] '회원 강제 탈퇴 시도 ");
+							c.sendMsg(outgameTag+"//"+nick);						
+						}
+					}
+					else {
+						JOptionPane.showMessageDialog(null, "탈퇴시킬 유저를 선택해주세요.","강제탈퇴",JOptionPane.ERROR_MESSAGE);
+						System.out.println("[Client_admin] '강제탈퇴' 입력 값이 존재하지 않음'");
+					}
+
+			} 
+
+		}
+    	
+    }
+    
+}
