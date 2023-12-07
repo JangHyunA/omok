@@ -1,6 +1,9 @@
 package omok;
 
 import javax.swing.*;
+import javax.swing.text.Style;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyledDocument;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -15,12 +18,12 @@ public class GameFrame extends JFrame{
 	JPanel eastPanel = new JPanel();
 	
 	/* List */
-	JList<String> userList = new JList<String>();
-	JList<String> playerList1 = new JList<String>();
-	JList<String> playerList2 = new JList<String>();
+	JList<String> everyuserList = new JList<String>();
 	
 	/* Label */
 	JLabel la1 = new JLabel();
+	JLabel player1 = new JLabel();
+	JLabel player2 = new JLabel();
 //	JLabel la2 = new JLabel();
 	JLabel la3 = new JLabel();
 	JLabel enableL = new JLabel();
@@ -29,6 +32,7 @@ public class GameFrame extends JFrame{
 //	JButton searchBtn = new JButton("전적검색");
 	JButton userBtn = new JButton("접속회원 모두보기");
 	JButton chatBtn = new JButton("전송");
+	JButton editBtn = new JButton("편집");
 	JButton loseBtn = new JButton("기권하기");
 	
 	String selUser;	//선택된 사용자
@@ -51,6 +55,8 @@ public class GameFrame extends JFrame{
 	final String whiteTag = "WHITE";	//흰색 돌 태그
 	final String winTag = "WIN";		//승리 태그
 	final String loseTag = "LOSE";		//패배 태그
+	final String VimgTag = "VIMG";
+	final String imgPathTag = "IMGPATH";	// 이미지 절대경로
 	
 	/* Socket과 입출력 스트림 */
 	ServerSocket svr_socket;
@@ -60,28 +66,75 @@ public class GameFrame extends JFrame{
     
     
 	JTextArea chatTextArea;
+	
+	// 이미지를 로드할 때 사용할 ImageIcons
+    ImageIcon player1Icon;
+    ImageIcon player2Icon;
+    
+    // 추가된 메소드: 이미지를 동적으로 변경하는 메소드
+    public void setPlayer1Image(String imagePath) {
+        ImageIcon newIcon = new ImageIcon(imagePath);
+        player1Icon = newIcon;
+        player1.setIcon(player1Icon);
+    }
+
+    public void setPlayer2Image(String imagePath) {
+        ImageIcon newIcon = new ImageIcon(imagePath);
+        player2Icon = newIcon;
+        player2.setIcon(player2Icon);
+    }
+    
+    // 이미지 경로를 요청하는 메소드
+    void requestImagePaths() {
+        c.sendMsg(imgPathTag + "//"+ " ");
+    }
+
+    // 이미지 경로를 처리하는 메소드
+    void handleImagePaths(String[] imagePaths) {
+        if (imagePaths.length >= 2) {
+            setPlayer1Image(imagePaths[0]);
+            setPlayer2Image(imagePaths[1]);
+        }
+    }
 
 	
 	GameFrame(Client _c) {
 		c = _c;
-			
-		/* List 크기 작업 */
-		playerList1.setPreferredSize(new Dimension(110, 150));
-		playerList2.setPreferredSize(new Dimension(110, 150));
+
 		
 		/* Label 크기 작업 */
 		la1.setPreferredSize(new Dimension(250, 10));
+	    player1.setPreferredSize(new Dimension(110, 130));
+	    player2.setPreferredSize(new Dimension(110, 130));
 //		la2.setPreferredSize(new Dimension(155, 0));
 		enableL.setPreferredSize(new Dimension(235, 30));
 		enableL.setHorizontalAlignment(JLabel.CENTER);
 		enableL.setForeground(Color.RED);
 		la3.setPreferredSize(new Dimension(250, 10));
 		
+		// 이미지 아이콘 초기화
+        player1Icon = new ImageIcon("path/to/default/player1_image.jpg");
+        player2Icon = new ImageIcon("path/to/default/player2_image.jpg");
+        
+        // 이미지 경로 요청
+        requestImagePaths();
+        
+        /* Label에 이미지 아이콘 설정 */
+        player1.setIcon(player1Icon);
+        player2.setIcon(player2Icon);
+        
+        // Add borders to the player labels
+        player1.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
+        player2.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
+
+		
 		/* Button 크기 작업 */
 //		searchBtn.setPreferredSize(new Dimension(90, 50));
 		userBtn.setPreferredSize(new Dimension(235, 30));
 		chatBtn.setPreferredSize(new Dimension(60, 30));
-		loseBtn.setPreferredSize(new Dimension(235, 30));
+		loseBtn.setPreferredSize(new Dimension(165, 30));
+		editBtn.setPreferredSize(new Dimension(65, 30));
+		
 		
 		/* Panel 추가 작업 */
 		setContentPane(basePanel);	//panel을 기본 컨테이너로 설정
@@ -99,10 +152,12 @@ public class GameFrame extends JFrame{
 		basePanel.add(eastPanel, BorderLayout.EAST);
 				
 		eastPanel.add(la1);
+        eastPanel.add(player1);
+        eastPanel.add(player2);
 //		eastPanel.add(la2);
 		eastPanel.add(userBtn);
-		eastPanel.add(playerList1);
-		eastPanel.add(playerList2);
+		eastPanel.add(player1);
+		eastPanel.add(player2);
 //		eastPanel.add(searchBtn);
 		eastPanel.add(enableL);
 		eastPanel.add(la3);
@@ -128,10 +183,25 @@ public class GameFrame extends JFrame{
 		chatPanel.add(chatInput);
 		chatPanel.add(chatBtn);
 		eastPanel.add(chatPanel);
-		
+
 		eastPanel.add(chatBtn);
 		eastPanel.add(loseBtn);
+		eastPanel.add(editBtn);
 		
+		loseBtn.setPreferredSize(new Dimension(160, 30));  // 기권하기 버튼 너비 조정
+		
+		// ActionListener를 구현하여 "편집" 버튼을 클릭했을 때 실행할 코드를 작성합니다.
+	    editBtn.addActionListener(new ActionListener() {
+	         @Override
+	         public void actionPerformed(ActionEvent e) {
+	             // 폰트 색상을 선택하는 색상 대화상자를 엽니다.
+	             Color selectedColor = JColorChooser.showDialog(null, "폰트 색상 선택", Color.BLACK);
+
+	             // 선택한 색상을 chatTextArea에 적용합니다.
+	             chatTextArea.setForeground(selectedColor);
+	         }
+	    });
+
 		
 		
 		// 클라이언트 소켓 초기화
@@ -166,6 +236,7 @@ public class GameFrame extends JFrame{
 		/* Button 이벤트 리스너 추가 */
 		ButtonListener bl = new ButtonListener();
 		loseBtn.addActionListener(bl);
+		editBtn.addActionListener(bl);
 		chatBtn.addActionListener(bl);
 		userBtn.addActionListener(bl);
 //		searchBtn.addActionListener(bl);
@@ -179,17 +250,31 @@ public class GameFrame extends JFrame{
 		userBtn.addActionListener(new ActionListener() {
 		    @Override
 		    public void actionPerformed(ActionEvent e) {
-		        if (!userList.isSelectionEmpty()) {
-		            String[] m = userList.getSelectedValue().split(" : ");
+		        if (!everyuserList.isSelectionEmpty()) {
+		            String[] m = everyuserList.getSelectedValue().split(" : ");
 		            selUser = m[0];
+		            System.out.println(selUser);
 		        }
 		    }
 		});
+		
+	
 
 		setSize(885, 660);
 		setResizable(false);
 		setLocationRelativeTo(null);
 	}
+	
+	// 이미지를 동적으로 변경하는 메소드
+    public void setPlayer1Image(ImageIcon imageIcon) {
+        player1Icon = imageIcon;
+        player1.setIcon(player1Icon);
+    }
+
+    public void setPlayer2Image(ImageIcon imageIcon) {
+        player2Icon = imageIcon;
+        player2.setIcon(player2Icon);
+    }
 	
 	@Override
 	public void paint(Graphics g) {	//panel에 그리기 작업
